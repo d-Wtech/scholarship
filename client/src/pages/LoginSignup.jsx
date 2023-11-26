@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Login from "../components/Login";
 import Register from "../components/Register";
-import logo from "../images/logo.png"
-// import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
+import { Link } from "react-router-dom";
 
 const LoginSignUp = () => {
   const [showLogin, setShowLogin] = useState(false);

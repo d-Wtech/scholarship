@@ -1,7 +1,6 @@
-import React from "react";
-import logo from "../images/logo.png"
+import logo from "../assets/logo.png";
 
-const TestResult = ({TestName}) => {
+const TestResult = ({ TestName }) => {
   return (
     <div className="">
       <div className="">
@@ -29,8 +28,8 @@ const TestResult = ({TestName}) => {
       </div>
       <div className="text-xs mt-10 p-2 flex flex-col gap-2">
         <p className="text-green-600 font-semibold">
-          {" "}
-          Dnyanankur Publication > Test Center > Mock Test > Test Details
+          Dnyanankur Publication {" > "} Test Center {" > "} Mock Test {" > "}
+          Test Details
         </p>
         <p className="font-bold text-base">
           Test Details <hr />

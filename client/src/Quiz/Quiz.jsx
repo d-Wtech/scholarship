@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Quiz = ({ TestName }) => {
   const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
@@ -51,7 +51,9 @@ const Quiz = ({ TestName }) => {
         <p className="bg-blue-400 w-1/5 text-center mx-5">English</p>
       </div>
       <div className="py-2 ">
-        <p className="border border-black font-serif text-2xl">Question No. 1</p>
+        <p className="border border-black font-serif text-2xl">
+          Question No. 1
+        </p>
         <p></p>
       </div>
     </div>

@@ -40,7 +40,7 @@ Before you begin, ensure you have the following dependencies installed:
 2. **Navigate to the project directory**
 
     ```bash
-    cd scholarship
+    cd scholarship/client
     ```
 
 3. **Install dependencies**
@@ -54,7 +54,7 @@ Before you begin, ensure you have the following dependencies installed:
 1. **Start the development server**
 
     ```bash
-    npm start
+    npm run dev
     ```
 
 2. **Open your browser**
