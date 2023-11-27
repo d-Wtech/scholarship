@@ -10,7 +10,7 @@ Welcome to the Scholarship Test Application! This React.js application is design
 
 - [Usage](#usage)
 
-- [API Usage](#api_usage)
+- [API Usage](#api-usage)
 
 - [Folder Structure](#folder-structure)
 
@@ -70,7 +70,14 @@ Before you begin, ensure you have the following dependencies installed:
 **Note:** Before moving ahead make sure you have created the `,env` file in the `api` folder and install the `mongodb` from official site [Visit MONGODB](https://www.mongodb.com) then paste this in `.env` file
 
         PORT=8090
-        MONGO_URI="mongodb://0.0.0.0:27017/test"
+        MONGO_URI="mongodb://0.0.0.0:27017/scholarhip"
+        JWT_SECRET_KEY=""
+
+`add the jwt secret key`
+
+also create a `.env` file in `client` directory and paste this in it and replace the `PORT` with the value shown on the terminal when you run the server
+
+        VITE_API_BASE_URL="http://localhost:[PORT]/api"
 
 in case you want to create online database then get the free or paid version from the mongodb site
 
