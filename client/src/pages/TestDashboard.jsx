@@ -3,9 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 const TestDashboard = ({ TestName }) => {
   const navigate = useNavigate();
-
   const handleOnStart = () => {
-    const startQuiz = window.confirm("Do You want to start exam");
+    const startQuiz = window.confirm("Do You want to start exam?");
     if (startQuiz) {
       // Redirect to the ${TestName}-quiz page
       navigate(`/${TestName}-quiz`);
