@@ -10,6 +10,8 @@ Welcome to the Scholarship Test Application! This React.js application is design
 
 - [Usage](#usage)
 
+- [API Usage](#api_usage)
+
 - [Folder Structure](#folder-structure)
 
 - [Technologies Used](#technologies-used)
@@ -63,6 +65,41 @@ Before you begin, ensure you have the following dependencies installed:
 
         http://localhost:[PORT]/
 
+## API Usage
+
+**Note:** Before moving ahead make sure you have created the `,env` file in the `api` folder and install the `mongodb` from official site [Visit MONGODB](https://www.mongodb.com) then paste this in `.env` file
+
+        PORT=8090
+        MONGO_URI="mongodb://0.0.0.0:27017/test"
+
+in case you want to create online database then get the free or paid version from the mongodb site
+
+1. **Navigate to api directory**
+
+    ```bash
+    cd api/
+    ```
+
+2. **Run the scripts**
+
+    1. for development
+
+        ```bash
+        npm run dev
+        ```
+
+    2. for production
+
+        ```bash
+        npm run start
+        ```
+
+3. **Test the API using POSTMAN**
+
+    1. start the new request
+
+    2. make `GET`, `POST`, `PUT`, `DELETE` request to `http://localhost:[PORT]/api/[ENDPOINT]`
+
 ## Folder Structure
 
 The project structure is organized as follows:
@@ -89,6 +126,12 @@ The project structure is organized as follows:
 - `React.js`: JavaScript library for building user interfaces.
 
 - `Tailwind CSS`: A utility-first CSS framework.
+
+- `Node.js`: a cross-platform, open-source JavaScript runtime environment that can run on Windows, Linux, Unix, macOS, and more
+
+- `Express js`: a back end web application framework for building RESTful APIs with Node.js
+
+- `Mongodb`: a source-available cross-platform document-oriented database program
 
 ## Features
 
