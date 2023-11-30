@@ -1,12 +1,10 @@
-import React from "react";
-import logo from "../images/logo.png";
+import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 
 const TestDashboard = ({ TestName }) => {
   const navigate = useNavigate();
-
   const handleOnStart = () => {
-    const startQuiz = window.confirm("Do You want to start exam");
+    const startQuiz = window.confirm("Do You want to start exam?");
     if (startQuiz) {
       // Redirect to the ${TestName}-quiz page
       navigate(`/${TestName}-quiz`);
@@ -42,7 +40,8 @@ const TestDashboard = ({ TestName }) => {
       </div>
       <div className="text-xs mt-10 p-2 flex flex-col gap-2">
         <p className="text-green-600 font-semibold">
-          Dnyanankur Publication > Test Center > Mock Test > Test Details
+          Dnyanankur Publication {" > "} Test Center {" > "} Mock Test {" > "} Test
+          Details
         </p>
         <p className="font-bold text-base">Test Preview</p>
         <div className="bg-white p-8 rounded shadow-md max-w-md text-base">

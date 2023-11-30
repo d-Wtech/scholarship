@@ -1,14 +1,12 @@
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const TestPreview = ({ TestName }) => {
   const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
   const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
   const [submitTest, setSubmitTest] = useState(false);
 
-
-  if(submitTest){
-alert("Test Submitted")
+  if (submitTest) {
+    alert("Test Submitted");
   }
 
   useEffect(() => {
@@ -91,7 +89,7 @@ alert("Test Submitted")
       <div className="text-center flex flex-col gap-2">
         <p>Do you want to Submit Test?</p>
         <div className="flex justify-center gap-14 ">
-          <button   type="button" className="bg-gray-200 px-3">
+          <button type="button" className="bg-gray-200 px-3">
             Yes
           </button>
           <button type="button" className="bg-gray-200 px-3">

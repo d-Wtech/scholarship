@@ -4,7 +4,7 @@ import TestDashboard from "./pages/TestDashboard";
 import LoginSignUp from "./pages/LoginSignUp";
 import TestPreview from "./pages/TestPreview";
 import TestResult from "./pages/TestResult";
-import Quiz from "./Quiz/Quiz.js";
+import Quiz from "./Quiz/Quiz";
 
 const App = () => {
   const TestName = "EcoSysytem-Test";

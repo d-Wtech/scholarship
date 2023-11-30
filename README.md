@@ -1,70 +1,154 @@
-# Getting Started with Create React App
+# Scholarship Test Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the Scholarship Test Application! This React.js application is designed to facilitate scholarship tests with a user-friendly interface. The application is powered by Tailwind CSS for a sleek and responsive design.
 
-## Available Scripts
+## Table of Contents
 
-In the project directory, you can run:
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
 
-### `npm start`
+- [Usage](#usage)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- [API Usage](#api-usage)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- [Folder Structure](#folder-structure)
 
-### `npm test`
+- [Technologies Used](#technologies-used)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [Features](#features)
 
-### `npm run build`
+- [Contributing](#contributing)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [License](#license)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
 
-### `npm run eject`
+Before you begin, ensure you have the following dependencies installed:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Node.js: [Download and Install Node.js](https://nodejs.org/)
+- npm: npm is included with Node.js. If not, [install npm](https://www.npmjs.com/get-npm)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Installation
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. **Clone the repository:**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+   ```bash
+   git clone https://github.com/d-Wtech/scholarship.git
+   ```
 
-## Learn More
+2. **Navigate to the project directory**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    ```bash
+    cd scholarship/client
+    ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. **Install dependencies**
 
-### Code Splitting
+    ```bash
+    npm install    
+    ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Usage
 
-### Analyzing the Bundle Size
+1. **Start the development server**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    ```bash
+    npm run dev
+    ```
 
-### Making a Progressive Web App
+2. **Open your browser**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. **Type in the URL**
 
-### Advanced Configuration
+        http://localhost:[PORT]/
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## API Usage
 
-### Deployment
+**Note:** Before moving ahead make sure you have created the `,env` file in the `api` folder and install the `mongodb` from official site [Visit MONGODB](https://www.mongodb.com) then paste this in `.env` file
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+        PORT=8090
+        MONGO_URI="mongodb://0.0.0.0:27017/scholarhip"
+        JWT_SECRET_KEY=""
 
-### `npm run build` fails to minify
+`add the jwt secret key`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+also create a `.env` file in `client` directory and paste this in it and replace the `PORT` with the value shown on the terminal when you run the server
+
+        VITE_API_BASE_URL="http://localhost:[PORT]/api"
+
+in case you want to create online database then get the free or paid version from the mongodb site
+
+1. **Navigate to api directory**
+
+    ```bash
+    cd api/
+    ```
+
+2. **Run the scripts**
+
+    1. for development
+
+        ```bash
+        npm run dev
+        ```
+
+    2. for production
+
+        ```bash
+        npm run start
+        ```
+
+3. **Test the API using POSTMAN**
+
+    1. start the new request
+
+    2. make `GET`, `POST`, `PUT`, `DELETE` request to `http://localhost:[PORT]/api/[ENDPOINT]`
+
+## Folder Structure
+
+The project structure is organized as follows:
+
+        scholarship/
+        ├── public/
+        │   ├── index.html
+        │   └── ...
+        ├── src/
+        │   ├── components/
+        │   │   └── ...
+        │   ├── styles/
+        │   │   └── tailwind.css
+        │   ├── App.js
+        │   ├── index.js
+        │   └── ...
+        ├── .gitignore
+        ├── package.json
+        ├── README.md
+        └── ...
+
+## Technologies Used
+
+- `React.js`: JavaScript library for building user interfaces.
+
+- `Tailwind CSS`: A utility-first CSS framework.
+
+- `Node.js`: a cross-platform, open-source JavaScript runtime environment that can run on Windows, Linux, Unix, macOS, and more
+
+- `Express js`: a back end web application framework for building RESTful APIs with Node.js
+
+- `Mongodb`: a source-available cross-platform document-oriented database program
+
+## Features
+
+- Responsive design
+- User friendly
+
+## Contributing
+
+If you'd like to contribute to the project, please follow the contributing guidelines.
+
+## License
+
+This project is licensed under the `MIT` License - see the LICENSE file for details.
