@@ -140,10 +140,13 @@ The project structure is organized as follows:
 
 - `Mongodb`: a source-available cross-platform document-oriented database program
 
+- `Redux`: an open-source JavaScript library for managing and centralizing application state
+
 ## Features
 
 - Responsive design
 - User friendly
+- fully secured
 
 ## Contributing
 

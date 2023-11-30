@@ -1,10 +1,13 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TestDashboard from "./pages/TestDashboard";
-import LoginSignUp from "./pages/LoginSignUp";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import TestPreview from "./pages/TestPreview";
 import TestResult from "./pages/TestResult";
 import Quiz from "./Quiz/Quiz";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const TestName = "EcoSysytem-Test";
@@ -12,7 +15,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginSignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route
           path="/test-dashboard"
           element={<TestDashboard TestName={TestName} />}
@@ -30,6 +34,7 @@ const App = () => {
           element={<TestResult TestName={TestName} />}
         />
       </Routes>
+      <ToastContainer />
     </BrowserRouter>
   );
 };
