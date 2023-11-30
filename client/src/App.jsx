@@ -6,6 +6,7 @@ import Signup from "./pages/Signup";
 import TestPreview from "./pages/TestPreview";
 import TestResult from "./pages/TestResult";
 import Quiz from "./Quiz/Quiz";
+import ErrorPage from "./pages/ErrorPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -33,6 +34,7 @@ const App = () => {
           path="/test-result"
           element={<TestResult TestName={TestName} />}
         />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
       <ToastContainer />
     </BrowserRouter>
