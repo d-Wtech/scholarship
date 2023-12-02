@@ -3,10 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import ProfileDropdown from "../Components/ProfileDropdown";
 import { resetUserData } from "../store/features/loginSlice";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const TestResult = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleToggleDropdown = () => {
@@ -18,6 +20,10 @@ const TestResult = ({ TestName }) => {
   };
 
   const handleDeleteAccount = () => {};
+
+  const moveToDashboard = () => {
+    navigate("/test-dashboard");
+  };
 
   return (
     <div className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 min-h-screen">
@@ -105,6 +111,7 @@ const TestResult = ({ TestName }) => {
           <button
             type="button"
             className="p-1 text-base bg-gray-200 border-b-black border shadow-md text-black w-fit"
+            onClick={moveToDashboard}
           >
             Back
           </button>

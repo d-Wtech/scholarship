@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  sendErrorMessage,
+  sendInfoMessage,
+  sendSuccessMessage,
+} from "../utils/notifier.js";
+import axios from "axios";
 
 const TestPreview = ({ TestName }) => {
+  const loginStatus = useSelector((state) => state.login);
+  const navigate = useNavigate();
+
+  const { testName } = useParams();
+
   const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
   const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
   const [submitTest, setSubmitTest] = useState(false);
@@ -14,18 +27,14 @@ const TestPreview = ({ TestName }) => {
       setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
 
-    // Cleanup the interval on component unmount
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    // Store the current timeLeft value in localStorage
     localStorage.setItem("testTimeLeft", timeLeft.toString());
 
-    // Check if time has reached 00:00 and submit the test
     if (timeLeft === 0 && !submitTest) {
       setSubmitTest(true);
-      // Perform the test submission logic here
       console.log("Test submitted!");
     }
   }, [timeLeft, submitTest]);
@@ -36,28 +45,57 @@ const TestPreview = ({ TestName }) => {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  const handleTestSubmit = async () => {
+    const accessToken = loginStatus.token;
+
+    if (accessToken) {
+      try {
+        const res = await axios.post(
+          `/api/${testName}/submit-test`,
+          {},
+          { headers: { Authorization: "Bearer " + accessToken } }
+        );
+
+        if (res.data.success) {
+          sendSuccessMessage("Test submitted!");
+          navigate(`/${testName}-result`);
+        } else {
+          sendInfoMessage("Cannot submit the test");
+        }
+      } catch (error) {
+        sendErrorMessage("Error submitting");
+      }
+    } else {
+      sendInfoMessage("You are not authenticated");
+    }
+  };
+
+  const handleTestUnsubmit = () => {
+    navigate(`/${testName}-quiz`);
+  };
+
   return (
-    <div className="flex flex-col gap-5">
-      <div className="bg-blue-400 text-white p-1 font-semibold">
+    <div className="flex flex-col gap-5 bg-gray-800 text-white p-6 min-h-screen">
+      <div className="bg-blue-500 p-4 font-semibold">
         <p>Test Name: {TestName}</p>
-        <p>Welcome: Anish</p>
-        <p>anishwanare9@gmail.com</p>
+        <p>Welcome: {loginStatus.firstName + " " + loginStatus.lastName}</p>
+        <p>{loginStatus.email}</p>
       </div>
-      <div className="mt-4 flex justify-between p-2 text-xs">
-        <p>Subject: English</p>
+      <div className="mt-4 flex justify-between p-4 text-xs">
+        <p>Subject: {testName}</p>
         <p>
           Time Left:{" "}
-          <span className="bg-yellow-300 px-2">{formatTime(timeLeft)} min</span>{" "}
+          <span className="bg-yellow-400 px-2">{formatTime(timeLeft)} min</span>{" "}
         </p>
       </div>
       <div className="mx-auto max-w-md ">
         <table className="table-auto w-full border">
           <thead>
             <tr>
-              <th className="bg-gray-200 border px-4 py-2 text-left">
+              <th className="bg-gray-600 border px-4 py-2 text-left">
                 English
               </th>
-              <th className="bg-gray-200 border px-4 py-2 text-left">
+              <th className="bg-gray-600 border px-4 py-2 text-left">
                 Details
               </th>
             </tr>
@@ -86,13 +124,21 @@ const TestPreview = ({ TestName }) => {
           </tbody>
         </table>
       </div>
-      <div className="text-center flex flex-col gap-2">
+      <div className="text-center flex flex-col gap-4 mt-4">
         <p>Do you want to Submit Test?</p>
-        <div className="flex justify-center gap-14 ">
-          <button type="button" className="bg-gray-200 px-3">
+        <div className="flex justify-center gap-8">
+          <button
+            type="button"
+            className="bg-green-600 text-white px-6 py-2 rounded"
+            onClick={handleTestSubmit}
+          >
             Yes
           </button>
-          <button type="button" className="bg-gray-200 px-3">
+          <button
+            type="button"
+            className="bg-red-600 text-white px-6 py-2 rounded"
+            onClick={handleTestUnsubmit}
+          >
             No
           </button>
         </div>

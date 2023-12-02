@@ -25,15 +25,15 @@ const App = () => {
             element={<TestDashboard TestName={TestName} />}
           />
           <Route
-            path="/test-preview"
+            path="/:testName-preview"
             element={<TestPreview TestName={TestName} />}
           />
           <Route
-            path={`/${TestName}-quiz`}
+            path={`/:testName-quiz`}
             element={<Quiz TestName={TestName} />}
           />
           <Route
-            path="/test-result"
+            path="/:testName-result"
             element={<TestResult TestName={TestName} />}
           />
         </Route>
