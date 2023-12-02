@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import { connectToDatabase } from "./src/connection/db.conn.js";
 import authRouter from "./src/routes/auth.route.js";
+import adminRouter from "./src/routes/admin.route.js";
 
 // configuring dotenv
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // routes
 app.use("/api", authRouter);
+app.use("/api", adminRouter);
 
 // starting express server
 app.listen(PORT, (err) => {

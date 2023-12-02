@@ -61,7 +61,6 @@ const Login = () => {
     try {
       if (validateForm()) {
         const res = await axios.post("/api/user-login", formData);
-        console.log(res);
         if (res.data.success) {
           sendSuccessMessage(res.data.message);
           const userData = res.data.userData;

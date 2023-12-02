@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import questions from "./QuizData.js";
+import { useSelector } from "react-redux";
 
 const Quiz = ({ TestName }) => {
+  const loginStatus = useSelector((state) => state.login);
+
   const navigate = useNavigate();
   const [questionNumber, setQuestionNumber] = useState(1);
 
@@ -65,8 +68,10 @@ const Quiz = ({ TestName }) => {
             <p className="mb-1 text-orange-500 text-2xl font-bold">
               {TestName}
             </p>
-            <p className="mb-1 text-base">Welcome Anish</p>
-            <p className="mb-1 text-sm">anishwanare9@gmail.com</p>
+            <p className="mb-1 text-base">
+              Welcome {loginStatus.firstName + " " + loginStatus.lastName}
+            </p>
+            <p className="mb-1 text-sm">{loginStatus.email}</p>
           </div>
           <div className="mt-2 md:mt-0">
             <p className="bg-orange-700 p-1 rounded-sm">
