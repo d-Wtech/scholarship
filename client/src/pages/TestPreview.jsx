@@ -10,17 +10,40 @@ import axios from "axios";
 
 const TestPreview = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
+  const userSolutions = useSelector((state) => state.userAns);
   const navigate = useNavigate();
 
   const { testName } = useParams();
+  const getVisitedCount = () => {
+    let c = 0;
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (userSolutions.solutions[i].visitedFlag) {
+        c++;
+      }
+    }
+    return c;
+  };
+  const getAnsweredCount = () => {
+    let c = 0;
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (
+        userSolutions.solutions[i].visitedFlag &&
+        userSolutions.solutions[i].optionId.length > 0
+      ) {
+        c++;
+      }
+    }
+    return c;
+  };
+  const info = {
+    totalQuestions: userSolutions.solutions.length,
+    answered: getAnsweredCount(),
+    visited: getVisitedCount(),
+  };
 
   const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
   const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
   const [submitTest, setSubmitTest] = useState(false);
-
-  if (submitTest) {
-    alert("Test Submitted");
-  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -103,23 +126,27 @@ const TestPreview = ({ TestName }) => {
           <tbody>
             <tr>
               <td className="border px-4 py-2">Total Questions</td>
-              <td className="border px-4 py-2">15</td>
+              <td className="border px-4 py-2">{info.totalQuestions}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Answered</td>
-              <td className="border px-4 py-2">15</td>
-            </tr>
-            <tr>
-              <td className="border px-4 py-2">Marked</td>
-              <td className="border px-4 py-2">15</td>
+              <td className="border px-4 py-2">{info.answered}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Not Answered</td>
-              <td className="border px-4 py-2">Row 1, Col 2</td>
+              <td className="border px-4 py-2">
+                {info.totalQuestions - info.answered}
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Visited</td>
+              <td className="border px-4 py-2">{info.visited}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Not Visited</td>
-              <td className="border px-4 py-2">0</td>
+              <td className="border px-4 py-2">
+                {info.totalQuestions - info.visited}
+              </td>
             </tr>
           </tbody>
         </table>

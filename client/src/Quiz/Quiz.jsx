@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { sendErrorMessage, sendInfoMessage } from "../utils/notifier.js";
 import axios from "axios";
 import Loading from "../Components/Loading.jsx";
+import {
+  setTestName,
+  setSolutions,
+  setVisitedFlag,
+} from "../store/features/userAns.js";
 
 const Quiz = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
+  const userSolutions = useSelector((state) => state.userAns);
+  const dispatch = useDispatch();
   const { testName } = useParams();
 
   const navigate = useNavigate();
@@ -32,6 +39,12 @@ const Quiz = ({ TestName }) => {
 
   const handleSubmitTest = () => {
     navigate(`/${testName}-preview`);
+  };
+
+  const colorPack = {
+    attempted: "#00ff00",
+    visited: "#ffff00",
+    default: "#94a3b8",
   };
 
   const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
@@ -80,7 +93,19 @@ const Quiz = ({ TestName }) => {
           );
 
           if (res.data.success) {
+            dispatch(setTestName({ testName }));
             setQuestions(res.data.questions.question);
+            if (userSolutions.solutions.length == 0) {
+              res.data.questions.question.forEach((question, index) => {
+                dispatch(
+                  setSolutions({
+                    questionId: question._id,
+                    optionId: "",
+                    visitedFlag: false,
+                  })
+                );
+              });
+            }
           } else {
             sendInfoMessage("Cannot get questions");
           }
@@ -94,6 +119,69 @@ const Quiz = ({ TestName }) => {
 
     getQuestions();
   }, []);
+
+  useEffect(() => {
+    const changeVisitedFlag = () => {
+      if (questions.length > 0 && userSolutions.solutions.length > 0) {
+        for (let i = 0; i < userSolutions.solutions.length; i++) {
+          if (
+            userSolutions.solutions[i].questionId ==
+            questions[questionNumber - 1]._id
+          ) {
+            dispatch(
+              setVisitedFlag({
+                questionId: userSolutions.solutions[i].questionId,
+                visitedFlag: true,
+              })
+            );
+          }
+        }
+      }
+    };
+
+    changeVisitedFlag();
+  }, [questionNumber]);
+
+  const handleInputChange = (e, questionId, optionId) => {
+    dispatch(
+      setSolutions({
+        questionId: questionId,
+        optionId: optionId,
+        visitedFlag: true,
+      })
+    );
+  };
+
+  const getCheckStatus = (questionId, optionId) => {
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (
+        userSolutions.solutions[i].questionId == questionId &&
+        userSolutions.solutions[i].optionId == optionId
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const changeBackgroundColor = (questionId) => {
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (userSolutions.solutions[i].questionId == questionId) {
+        if (
+          userSolutions.solutions[i].visitedFlag &&
+          userSolutions.solutions[i].optionId.length > 0
+        ) {
+          return colorPack.attempted;
+        } else if (
+          userSolutions.solutions[i].visitedFlag &&
+          userSolutions.solutions[i].optionId.length == 0
+        ) {
+          return colorPack.visited;
+        }
+      }
+    }
+    return colorPack.default;
+  };
 
   return (
     <>
@@ -146,10 +234,25 @@ const Quiz = ({ TestName }) => {
                       <label
                         key={index}
                         className="flex flex-row mb-3 text-gray-700"
+                        htmlFor={option._id}
                       >
                         <input
                           type="radio"
+                          id={option._id}
+                          name={`question_${questionNumber}`}
                           className="mr-2 appearance-none h-6 w-6 border border-gray-300 rounded-md checked:bg-blue-500 checked:border-transparent focus:outline-none focus:ring focus:border-blue-300"
+                          value={option.answerText}
+                          checked={getCheckStatus(
+                            questions[questionNumber - 1]._id,
+                            option._id
+                          )}
+                          onChange={(e) => {
+                            handleInputChange(
+                              e,
+                              questions[questionNumber - 1]._id,
+                              option._id
+                            );
+                          }}
                         />
                         {option.answerText}
                       </label>
@@ -181,7 +284,9 @@ const Quiz = ({ TestName }) => {
                   {questions.map((value, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-center bg-slate-300 h-12 w-12 rounded-md mb-2 md:mb-0 cursor-pointer hover:bg-white"
+                      className="flex items-center justify-center h-12 w-12 rounded-md mb-2 md:mb-0 cursor-pointer"
+                      id={`${value._id}`}
+                      style={{ background: changeBackgroundColor(value._id) }}
                       onClick={() => {
                         moveToGivenQuestionNumber(index + 1);
                       }}
@@ -205,7 +310,12 @@ const Quiz = ({ TestName }) => {
                       className="w-6 h-6 mr-2"
                       viewBox="0 0 24 24"
                     >
-                      <circle cx="12" cy="12" r="10" fill="#00ff00" />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill={colorPack.attempted}
+                      />
                     </svg>
                     <span className="text-white">Attempted</span>
                   </div>
@@ -220,22 +330,7 @@ const Quiz = ({ TestName }) => {
                       className="w-6 h-6 mr-2"
                       viewBox="0 0 24 24"
                     >
-                      <circle cx="12" cy="12" r="10" fill="#ff0000" />
-                    </svg>
-                    <span className="text-white">Not Attempted</span>
-                  </div>
-                  <div className="flex flex-row m-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="w-6 h-6 mr-2"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle cx="12" cy="12" r="10" fill="#ffff00" />
+                      <circle cx="12" cy="12" r="10" fill={colorPack.visited} />
                     </svg>
                     <span className="text-white">Visited</span>
                   </div>
@@ -250,7 +345,7 @@ const Quiz = ({ TestName }) => {
                       className="w-6 h-6 mr-2"
                       viewBox="0 0 24 24"
                     >
-                      <circle cx="12" cy="12" r="10" fill="#94a3b8" />
+                      <circle cx="12" cy="12" r="10" fill={colorPack.default} />
                     </svg>
                     <span className="text-white">Not Visited</span>
                   </div>
