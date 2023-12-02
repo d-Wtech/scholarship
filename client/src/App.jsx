@@ -9,6 +9,7 @@ import Quiz from "./Quiz/Quiz";
 import ErrorPage from "./pages/ErrorPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Private from "./pages/Private";
 
 const App = () => {
   const TestName = "EcoSysytem-Test";
@@ -18,22 +19,24 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/test-dashboard"
-          element={<TestDashboard TestName={TestName} />}
-        />
-        <Route
-          path="/test-preview"
-          element={<TestPreview TestName={TestName} />}
-        />
-        <Route
-          path={`/${TestName}-quiz`}
-          element={<Quiz TestName={TestName} />}
-        />
-        <Route
-          path="/test-result"
-          element={<TestResult TestName={TestName} />}
-        />
+        <Route element={<Private />}>
+          <Route
+            path="/test-dashboard"
+            element={<TestDashboard TestName={TestName} />}
+          />
+          <Route
+            path="/test-preview"
+            element={<TestPreview TestName={TestName} />}
+          />
+          <Route
+            path={`/${TestName}-quiz`}
+            element={<Quiz TestName={TestName} />}
+          />
+          <Route
+            path="/test-result"
+            element={<TestResult TestName={TestName} />}
+          />
+        </Route>
         <Route path="*" element={<ErrorPage />} />
       </Routes>
       <ToastContainer />
