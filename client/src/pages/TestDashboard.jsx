@@ -1,17 +1,34 @@
 import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import ProfileDropdown from "../Components/ProfileDropdown";
+import { resetUserData } from "../store/features/loginSlice.js";
+import { useDispatch } from "react-redux";
 
 const TestDashboard = ({ TestName }) => {
+  const loginStatus = useSelector((state) => state.login);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleOnStart = () => {
     const startQuiz = window.confirm("Do You want to start exam?");
     if (startQuiz) {
-      // Redirect to the ${TestName}-quiz page
       navigate(`/${TestName}-quiz`);
-    } else {
-      // do nothing
     }
   };
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleToggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    dispatch(resetUserData());
+  };
+
+  const handleDeleteAccount = () => {};
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
@@ -24,16 +41,40 @@ const TestDashboard = ({ TestName }) => {
           />
 
           <div className="mt-4">
-            <select
-              name="userDashboard"
-              className="text-center bg-gray-800 text-white w-full p-2 rounded"
+            <button
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              type="button"
+              onClick={handleToggleDropdown}
             >
-              <option value="anish">Anish</option>
-              <option value="anishwanare9@gmail.com" disabled>
-                Email: anishwanare9@gmail.com
-              </option>
-              <option value="logout">Logout</option>
-            </select>
+              Profile
+              <svg
+                class="w-2.5 h-2.5 ms-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+            {isDropdownOpen ? (
+              <ProfileDropdown
+                name={loginStatus.firstName + " " + loginStatus.lastName}
+                email={loginStatus.email}
+                phone={loginStatus.mobileNumber}
+                regd={loginStatus.registeredAt}
+                handleLogout={handleLogout}
+                handleDelAccount={handleDeleteAccount}
+              />
+            ) : (
+              <></>
+            )}
           </div>
           <hr className="h-1 bg-white w-full my-4" />
         </div>

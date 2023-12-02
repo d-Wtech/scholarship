@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendErrorMessage, sendSuccessMessage } from "../utils/notifier";
 import axios from "axios";
+import { setUserData } from "../store/features/loginSlice.js";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -61,6 +64,17 @@ const Login = () => {
         console.log(res);
         if (res.data.success) {
           sendSuccessMessage(res.data.message);
+          const userData = res.data.userData;
+          dispatch(
+            setUserData({
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email,
+              mobileNumber: userData.mobileNumber,
+              registeredAt: userData.regd,
+              token: userData.token,
+            })
+          );
           navigate("/test-dashboard");
         } else {
           sendErrorMessage(res.data.error);
