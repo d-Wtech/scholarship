@@ -5,9 +5,11 @@ import { sendErrorMessage, sendInfoMessage } from "../utils/notifier.js";
 import axios from "axios";
 import Loading from "../Components/Loading.jsx";
 import {
-  setTestName,
+  setTestDetails,
   setSolutions,
   setVisitedFlag,
+  setTimer,
+  updateTimer,
 } from "../store/features/userAns.js";
 
 const Quiz = ({ TestName }) => {
@@ -17,6 +19,26 @@ const Quiz = ({ TestName }) => {
   const { testName } = useParams();
 
   const navigate = useNavigate();
+
+  const getTotalTimeInSeconds = (timeAvailable) => {
+    const h_m_s = timeAvailable.split(":");
+    let h = Number(h_m_s[0]);
+    let m = Number(h_m_s[1]);
+    let s = Number(h_m_s[2]);
+    return h * 3600 + m * 60 + s;
+  };
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const formattedTime = `${String(hrs).padStart(2, "0")}:${String(
+      mins
+    ).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return formattedTime;
+  };
+
   const [questionNumber, setQuestionNumber] = useState(1);
 
   const [questions, setQuestions] = useState([]);
@@ -47,34 +69,18 @@ const Quiz = ({ TestName }) => {
     default: "#94a3b8",
   };
 
-  const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
-  const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
-
+  // start timer
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      dispatch(updateTimer());
     }, 1000);
 
-    // Cleanup the interval on component unmount
+    if (userSolutions.timer == 0) {
+      handleSubmitTest();
+    }
+
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    // Store the current timeLeft value in localStorage
-    localStorage.setItem("testTimeLeft", timeLeft.toString());
-
-    // Check if time has reached 00:00 and submit the test
-    if (timeLeft === 0) {
-      // Perform the test submission logic here
-      console.log("Test submitted!");
-    }
-  }, [timeLeft]);
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -93,10 +99,12 @@ const Quiz = ({ TestName }) => {
           );
 
           if (res.data.success) {
-            dispatch(setTestName({ testName }));
             setQuestions(res.data.questions.question);
+            dispatch(setTestDetails(res.data.test));
+
             if (userSolutions.solutions.length == 0) {
               sendInfoMessage("Test Started");
+
               res.data.questions.question.forEach((question, index) => {
                 if (index == 0) {
                   dispatch(
@@ -116,6 +124,12 @@ const Quiz = ({ TestName }) => {
                   );
                 }
               });
+
+              dispatch(
+                setTimer({
+                  time: getTotalTimeInSeconds(res.data.test.timeAvailable),
+                })
+              );
             }
           } else {
             sendInfoMessage("Cannot get questions");
@@ -211,7 +225,11 @@ const Quiz = ({ TestName }) => {
           </div>
           <div className="mt-2 md:mt-0">
             <p className="bg-orange-700 p-1 rounded-sm">
-              <span className="px-2 text-base">{formatTime(timeLeft)} min</span>
+              <span className="px-2 text-base">
+                {userSolutions.timer
+                  ? formatTime(userSolutions.timer)
+                  : "00:00:00"}
+              </span>
             </p>
           </div>
         </div>

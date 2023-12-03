@@ -2,7 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   testName: "",
+  totalQuestions: 0,
+  marksPerQuestion: 0,
+  negativeMarking: false,
+  timeAvailable: "",
   solutions: [],
+  timer: -1,
 };
 
 const checkPresence = (arr, key) => {
@@ -18,8 +23,12 @@ const userAnsSlice = createSlice({
   name: "userAns",
   initialState,
   reducers: {
-    setTestName: (state, action) => {
+    setTestDetails: (state, action) => {
       state.testName = action.payload.testName;
+      state.totalQuestions = action.payload.totalQuestions;
+      state.marksPerQuestion = action.payload.marksPerQuestion;
+      state.negativeMarking = action.payload.negativeMarking;
+      state.timeAvailable = action.payload.timeAvailable;
     },
     setSolutions: (state, action) => {
       const data = {
@@ -41,14 +50,31 @@ const userAnsSlice = createSlice({
         state.solutions[res[0]].visitedFlag = action.payload.visitedFlag;
       }
     },
+    setTimer: (state, action) => {
+      state.timer = action.payload.time;
+    },
+    updateTimer: (state, action) => {
+      state.timer -= 1;
+    },
     resetUserAnsState: (state) => {
       state.testName = "";
+      state.totalQuestions = 0;
+      state.marksPerQuestion = 0;
+      state.negativeMarking = false;
+      state.timeAvailable = "";
       state.solutions = [];
+      state.timer = -1;
     },
   },
 });
 
-export const { setTestName, setSolutions, setVisitedFlag, resetUserAnsState } =
-  userAnsSlice.actions;
+export const {
+  setTestDetails,
+  setSolutions,
+  setVisitedFlag,
+  setTimer,
+  updateTimer,
+  resetUserAnsState,
+} = userAnsSlice.actions;
 
 export default userAnsSlice.reducer;

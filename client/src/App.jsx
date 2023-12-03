@@ -29,7 +29,9 @@ const App = () => {
             element={<TestPreview TestName={TestName} />}
           />
           <Route
-            path={`/:testName-quiz`}
+            path={
+              "/:testName-quiz/total-questions-/:totalQuestions/marks-per-question-/:marksPerQuestion/negative-marking-/:negativeMarking/time-available-/:timeAvailable"
+            }
             element={<Quiz TestName={TestName} />}
           />
           <Route

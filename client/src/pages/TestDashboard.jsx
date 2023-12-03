@@ -16,9 +16,17 @@ const TestDashboard = ({ TestName }) => {
 
   const [testDetail, setTestDetail] = useState(null);
 
-  const handleOnStart = (testname) => {
+  const handleOnStart = (
+    testname,
+    totalQuestions,
+    marksPerQuestion,
+    negativeMarking,
+    timeAvailable
+  ) => {
     if (window.confirm("Do You want to start exam?")) {
-      navigate(`/${testname}-quiz`);
+      navigate(
+        `/${testname}-quiz/total-questions-/${totalQuestions}/marks-per-question-/${marksPerQuestion}/negative-marking-/${negativeMarking}/time-available-/${timeAvailable}`
+      );
     }
   };
 
@@ -159,7 +167,13 @@ const TestDashboard = ({ TestName }) => {
                       type="button"
                       className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-2 sm:mb-0 sm:mr-4"
                       onClick={() => {
-                        handleOnStart(test.testName);
+                        handleOnStart(
+                          test.testName,
+                          test.totalQuestions,
+                          test.marksPerQuestion,
+                          test.negativeMarking,
+                          test.timeAvailable
+                        );
                       }}
                     >
                       Start Exam

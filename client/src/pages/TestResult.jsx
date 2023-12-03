@@ -276,7 +276,8 @@ const TestResult = ({ TestName }) => {
                   {userTestResult.marksPerQuestion *
                     userTestResult.correctQuestions -
                     userTestResult.negativeMarking *
-                      userTestResult.incorrectQuestions}
+                      userTestResult.incorrectQuestions *
+                      userTestResult.marksPerQuestion}
                 </td>
               </tr>
               <tr>

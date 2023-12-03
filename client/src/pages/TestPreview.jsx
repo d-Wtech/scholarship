@@ -7,7 +7,7 @@ import {
   sendSuccessMessage,
 } from "../utils/notifier.js";
 import axios from "axios";
-import { resetUserAnsState } from "../store/features/userAns.js";
+import { resetUserAnsState, updateTimer } from "../store/features/userAns.js";
 
 const TestPreview = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
@@ -16,6 +16,18 @@ const TestPreview = ({ TestName }) => {
   const dispatch = useDispatch();
 
   const { testName } = useParams();
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const formattedTime = `${String(hrs).padStart(2, "0")}:${String(
+      mins
+    ).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return formattedTime;
+  };
+
   const getVisitedCount = () => {
     let c = 0;
     for (let i = 0; i < userSolutions.solutions.length; i++) {
@@ -25,6 +37,7 @@ const TestPreview = ({ TestName }) => {
     }
     return c;
   };
+
   const getAnsweredCount = () => {
     let c = 0;
     for (let i = 0; i < userSolutions.solutions.length; i++) {
@@ -37,38 +50,24 @@ const TestPreview = ({ TestName }) => {
     }
     return c;
   };
+
   const info = {
     totalQuestions: userSolutions.solutions.length,
     answered: getAnsweredCount(),
     visited: getVisitedCount(),
   };
 
-  const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
-  const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
-  const [submitTest, setSubmitTest] = useState(false);
-
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      dispatch(updateTimer());
     }, 1000);
+
+    if (userSolutions.timer == 0) {
+      handleTestSubmit();
+    }
 
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("testTimeLeft", timeLeft.toString());
-
-    if (timeLeft === 0 && !submitTest) {
-      setSubmitTest(true);
-      console.log("Test submitted!");
-    }
-  }, [timeLeft, submitTest]);
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
 
   const handleTestSubmit = async () => {
     const accessToken = loginStatus.token;
@@ -99,8 +98,16 @@ const TestPreview = ({ TestName }) => {
     }
   };
 
-  const handleTestUnsubmit = () => {
-    navigate(`/${testName}-quiz`);
+  const handleTestUnsubmit = (
+    testname,
+    totalQuestions,
+    marksPerQuestion,
+    negativeMarking,
+    timeAvailable
+  ) => {
+    navigate(
+      `/${testname}-quiz/total-questions-/${totalQuestions}/marks-per-question-/${marksPerQuestion}/negative-marking-/${negativeMarking}/time-available-/${timeAvailable}`
+    );
   };
 
   return (
@@ -114,7 +121,9 @@ const TestPreview = ({ TestName }) => {
         <p>Subject: {testName}</p>
         <p>
           Time Left:{" "}
-          <span className="bg-yellow-400 px-2">{formatTime(timeLeft)} min</span>{" "}
+          <span className="bg-yellow-400 px-2">
+            {userSolutions.timer ? formatTime(userSolutions.timer) : "00:00:00"}
+          </span>{" "}
         </p>
       </div>
       <div className="mx-auto max-w-md ">
@@ -170,7 +179,15 @@ const TestPreview = ({ TestName }) => {
           <button
             type="button"
             className="bg-red-600 text-white px-6 py-2 rounded"
-            onClick={handleTestUnsubmit}
+            onClick={() => {
+              handleTestUnsubmit(
+                testName,
+                userSolutions.totalQuestions,
+                userSolutions.marksPerQuestion,
+                userSolutions.negativeMarking,
+                userSolutions.timeAvailable
+              );
+            }}
           >
             No
           </button>

@@ -46,6 +46,13 @@ export const getQuestions = async (req, res) => {
       throw err;
     }
 
+    // finding test
+    const test = await testModel.findOne({ testName });
+    if (!test) {
+      const err = new Error("Test not found");
+      throw err;
+    }
+
     // getting the question
     const questions = await questionModel.findOne({ testName });
     if (!questions) {
@@ -53,7 +60,12 @@ export const getQuestions = async (req, res) => {
       throw err;
     }
 
-    res.json({ success: true, message: "Question found and sent", questions });
+    res.json({
+      success: true,
+      message: "Question found and sent",
+      questions,
+      test,
+    });
   } catch (error) {
     res.json({ success: false, error: error.message });
   }
