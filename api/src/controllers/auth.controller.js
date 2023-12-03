@@ -71,7 +71,16 @@ export const userLogin = async (req, res) => {
     // generating token
     const token = generateToken(user._id);
 
-    res.json({ success: true, message: "Login Successfull", token });
+    const userData = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      mobileNumber: user.mobileNumber,
+      regd: user.createdAt,
+      token: token,
+    };
+
+    res.json({ success: true, message: "Login Successfull", userData });
   } catch (error) {
     res.json({ success: false, error: error.message });
   }

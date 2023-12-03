@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  sendSuccessMessage,
+  sendInfoMessage,
+  sendErrorMessage,
+} from "../utils/notifier.js";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -100,88 +109,114 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
-      const paymentSuccess = await handlePayment();
+    try {
+      if (validateForm()) {
+        // registering the user
+        const data = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          mobileNumber: formData.mobileNumber,
+          password: formData.password,
+        };
 
-      if (paymentSuccess) {
-        // Your form submission logic here
-        console.log("Form submitted:", formData);
+        const res = await axios.post("/api/user-signup", data);
+        if (res.data.success) {
+          sendSuccessMessage(res.data.message);
+          sendInfoMessage("Now you can login");
+          navigate("/login");
+        } else {
+          sendErrorMessage(res.data.error);
+        }
       } else {
-        console.log("Payment failed");
+        throw new Error("Invalid details entered");
       }
-    } else {
-      console.log("Form validation failed");
+    } catch (error) {
+      sendErrorMessage("Form Validation failed");
     }
   };
+
   return (
     <form className="flex flex-col gap-2 p-1.5" onSubmit={handleSubmit}>
-      <label htmlFor="">
+      <label htmlFor="firstName">
         First Name: <span className="text-red-500">*</span>{" "}
         <input
           type="text"
           name="firstName"
+          id="firstName"
           value={formData.firstName}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />
         <div className="text-red-500">{errors.firstName}</div>
       </label>
-      <label htmlFor="">
+      <label htmlFor="lastName">
         Last Name: <span className="text-red-500">*</span>{" "}
         <input
           type="text"
           name="lastName"
+          id="lastName"
           value={formData.lastName}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />
         <div className="text-red-500">{errors.lastName}</div>
       </label>
-      <label htmlFor="">
+      <label htmlFor="email">
         Email id: <span className="text-red-500">*</span>{" "}
         <input
           type="email"
           name="email"
+          id="email"
           value={formData.email}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />
         <div className="text-red-500">{errors.email}</div>
       </label>
-      <label htmlFor="">
+      <label htmlFor="mobileNumber">
         Mobile Number: <span className="text-red-500">*</span>{" "}
         <input
           type="number"
           name="mobileNumber"
+          id="mobileNumber"
           value={formData.mobileNumber}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />
         <div className="text-red-500">{errors.mobileNumber}</div>
       </label>
-      <label htmlFor="">
+      <label htmlFor="password">
         Password: <span className="text-red-500">*</span>{" "}
         <input
           type="password"
           name="password"
+          id="password"
           value={formData.password}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />
         <div className="text-red-500">{errors.password}</div>
       </label>
-      <label htmlFor="">
+      <label htmlFor="confirmPassword">
         Confirm Password: <span className="text-red-500">*</span>{" "}
         <input
           type="password"
           name="confirmPassword"
+          id="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
+          autoComplete="off"
           className="border border-black w-full p-1.5 rounded-lg hover:shadow-lg"
           required
         />

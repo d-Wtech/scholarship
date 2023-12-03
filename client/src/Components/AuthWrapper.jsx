@@ -1,14 +1,13 @@
-import { useState } from "react";
-import Login from "../components/Login";
-import Register from "../components/Register";
 import logo from "../assets/logo.png";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-const LoginSignUp = () => {
-  const [showLogin, setShowLogin] = useState(false);
+const LoginSignUp = ({ jsxElement, endPoint, showLogin }) => {
+  const navigate = useNavigate();
 
-  const toggleComponent = () => {
-    setShowLogin(!showLogin);
+  const handleClick = (e) => {
+    if (e.target.classList.contains("cursor-pointer")) {
+      navigate(endPoint);
+    }
   };
 
   return (
@@ -33,7 +32,7 @@ const LoginSignUp = () => {
             className={
               showLogin ? "cursor-pointer" : "bg-blue-400 px-2 text-white"
             }
-            onClick={toggleComponent}
+            onClick={handleClick}
           >
             Register
           </div>
@@ -41,14 +40,14 @@ const LoginSignUp = () => {
             className={
               showLogin ? "bg-blue-400 px-2 text-white" : "cursor-pointer"
             }
-            onClick={toggleComponent}
+            onClick={handleClick}
           >
             Login
           </div>
         </div>
         <hr className=" h-[2px] bg-blue-900" />
 
-        <div className="mt-6">{showLogin ? <Login /> : <Register />}</div>
+        <div className="mt-6">{jsxElement}</div>
       </div>
     </div>
   );

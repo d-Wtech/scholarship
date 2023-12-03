@@ -1,63 +1,139 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  sendErrorMessage,
+  sendInfoMessage,
+  sendSuccessMessage,
+} from "../utils/notifier.js";
+import axios from "axios";
+import { resetUserAnsState, updateTimer } from "../store/features/userAns.js";
 
 const TestPreview = ({ TestName }) => {
-  const initialTime = localStorage.getItem("testTimeLeft") || 30 * 60;
-  const [timeLeft, setTimeLeft] = useState(parseInt(initialTime, 10));
-  const [submitTest, setSubmitTest] = useState(false);
+  const loginStatus = useSelector((state) => state.login);
+  const userSolutions = useSelector((state) => state.userAns);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  if (submitTest) {
-    alert("Test Submitted");
-  }
+  const { testName } = useParams();
+
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const formattedTime = `${String(hrs).padStart(2, "0")}:${String(
+      mins
+    ).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return formattedTime;
+  };
+
+  const getVisitedCount = () => {
+    let c = 0;
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (userSolutions.solutions[i].visitedFlag) {
+        c++;
+      }
+    }
+    return c;
+  };
+
+  const getAnsweredCount = () => {
+    let c = 0;
+    for (let i = 0; i < userSolutions.solutions.length; i++) {
+      if (
+        userSolutions.solutions[i].visitedFlag &&
+        userSolutions.solutions[i].optionId != null
+      ) {
+        c++;
+      }
+    }
+    return c;
+  };
+
+  const info = {
+    totalQuestions: userSolutions.solutions.length,
+    answered: getAnsweredCount(),
+    visited: getVisitedCount(),
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      dispatch(updateTimer());
     }, 1000);
 
-    // Cleanup the interval on component unmount
+    if (userSolutions.timer == 0) {
+      handleTestSubmit();
+    }
+
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    // Store the current timeLeft value in localStorage
-    localStorage.setItem("testTimeLeft", timeLeft.toString());
+  const handleTestSubmit = async () => {
+    const accessToken = loginStatus.token;
 
-    // Check if time has reached 00:00 and submit the test
-    if (timeLeft === 0 && !submitTest) {
-      setSubmitTest(true);
-      // Perform the test submission logic here
-      console.log("Test submitted!");
+    if (accessToken) {
+      try {
+        const res = await axios.post(
+          `/api/${testName}/submit-test`,
+          {
+            testName: userSolutions.testName,
+            solutions: userSolutions.solutions,
+          },
+          { headers: { Authorization: "Bearer " + accessToken } }
+        );
+
+        if (res.data.success) {
+          sendSuccessMessage("Test submitted!");
+          navigate(`/${testName}-result`);
+          dispatch(resetUserAnsState());
+        } else {
+          sendInfoMessage("Cannot submit the test");
+        }
+      } catch (error) {
+        sendErrorMessage("Error submitting");
+      }
+    } else {
+      sendInfoMessage("You are not authenticated");
     }
-  }, [timeLeft, submitTest]);
+  };
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  const handleTestUnsubmit = (
+    testname,
+    totalQuestions,
+    marksPerQuestion,
+    negativeMarking,
+    timeAvailable
+  ) => {
+    navigate(
+      `/${testname}-quiz/total-questions-/${totalQuestions}/marks-per-question-/${marksPerQuestion}/negative-marking-/${negativeMarking}/time-available-/${timeAvailable}`
+    );
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="bg-blue-400 text-white p-1 font-semibold">
+    <div className="flex flex-col gap-5 bg-gray-800 text-white p-6 min-h-screen">
+      <div className="bg-blue-500 p-4 font-semibold">
         <p>Test Name: {TestName}</p>
-        <p>Welcome: Anish</p>
-        <p>anishwanare9@gmail.com</p>
+        <p>Welcome: {loginStatus.firstName + " " + loginStatus.lastName}</p>
+        <p>{loginStatus.email}</p>
       </div>
-      <div className="mt-4 flex justify-between p-2 text-xs">
-        <p>Subject: English</p>
+      <div className="mt-4 flex justify-between p-4 text-xs">
+        <p>Subject: {testName}</p>
         <p>
           Time Left:{" "}
-          <span className="bg-yellow-300 px-2">{formatTime(timeLeft)} min</span>{" "}
+          <span className="bg-yellow-400 px-2">
+            {userSolutions.timer ? formatTime(userSolutions.timer) : "00:00:00"}
+          </span>{" "}
         </p>
       </div>
       <div className="mx-auto max-w-md ">
         <table className="table-auto w-full border">
           <thead>
             <tr>
-              <th className="bg-gray-200 border px-4 py-2 text-left">
+              <th className="bg-gray-600 border px-4 py-2 text-left">
                 English
               </th>
-              <th className="bg-gray-200 border px-4 py-2 text-left">
+              <th className="bg-gray-600 border px-4 py-2 text-left">
                 Details
               </th>
             </tr>
@@ -65,34 +141,54 @@ const TestPreview = ({ TestName }) => {
           <tbody>
             <tr>
               <td className="border px-4 py-2">Total Questions</td>
-              <td className="border px-4 py-2">15</td>
+              <td className="border px-4 py-2">{info.totalQuestions}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Answered</td>
-              <td className="border px-4 py-2">15</td>
-            </tr>
-            <tr>
-              <td className="border px-4 py-2">Marked</td>
-              <td className="border px-4 py-2">15</td>
+              <td className="border px-4 py-2">{info.answered}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Not Answered</td>
-              <td className="border px-4 py-2">Row 1, Col 2</td>
+              <td className="border px-4 py-2">
+                {info.totalQuestions - info.answered}
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Visited</td>
+              <td className="border px-4 py-2">{info.visited}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Not Visited</td>
-              <td className="border px-4 py-2">0</td>
+              <td className="border px-4 py-2">
+                {info.totalQuestions - info.visited}
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div className="text-center flex flex-col gap-2">
+      <div className="text-center flex flex-col gap-4 mt-4">
         <p>Do you want to Submit Test?</p>
-        <div className="flex justify-center gap-14 ">
-          <button type="button" className="bg-gray-200 px-3">
+        <div className="flex justify-center gap-8">
+          <button
+            type="button"
+            className="bg-green-600 text-white px-6 py-2 rounded"
+            onClick={handleTestSubmit}
+          >
             Yes
           </button>
-          <button type="button" className="bg-gray-200 px-3">
+          <button
+            type="button"
+            className="bg-red-600 text-white px-6 py-2 rounded"
+            onClick={() => {
+              handleTestUnsubmit(
+                testName,
+                userSolutions.totalQuestions,
+                userSolutions.marksPerQuestion,
+                userSolutions.negativeMarking,
+                userSolutions.timeAvailable
+              );
+            }}
+          >
             No
           </button>
         </div>
