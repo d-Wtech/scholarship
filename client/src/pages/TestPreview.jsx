@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   sendErrorMessage,
@@ -7,11 +7,13 @@ import {
   sendSuccessMessage,
 } from "../utils/notifier.js";
 import axios from "axios";
+import { resetUserAnsState } from "../store/features/userAns.js";
 
 const TestPreview = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
   const userSolutions = useSelector((state) => state.userAns);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { testName } = useParams();
   const getVisitedCount = () => {
@@ -28,7 +30,7 @@ const TestPreview = ({ TestName }) => {
     for (let i = 0; i < userSolutions.solutions.length; i++) {
       if (
         userSolutions.solutions[i].visitedFlag &&
-        userSolutions.solutions[i].optionId.length > 0
+        userSolutions.solutions[i].optionId != null
       ) {
         c++;
       }
@@ -75,13 +77,17 @@ const TestPreview = ({ TestName }) => {
       try {
         const res = await axios.post(
           `/api/${testName}/submit-test`,
-          {},
+          {
+            testName: userSolutions.testName,
+            solutions: userSolutions.solutions,
+          },
           { headers: { Authorization: "Bearer " + accessToken } }
         );
 
         if (res.data.success) {
           sendSuccessMessage("Test submitted!");
           navigate(`/${testName}-result`);
+          dispatch(resetUserAnsState());
         } else {
           sendInfoMessage("Cannot submit the test");
         }

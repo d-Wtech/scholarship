@@ -6,6 +6,7 @@ import { connectToDatabase } from "./src/connection/db.conn.js";
 import authRouter from "./src/routes/auth.route.js";
 import adminRouter from "./src/routes/admin.route.js";
 import userRouter from "./src/routes/user.route.js";
+import userRecordRouter from "./src/routes/userRecord.route.js";
 
 // configuring dotenv
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", authRouter);
 app.use("/api", adminRouter);
 app.use("/api", userRouter);
+app.use("/api", userRecordRouter);
 
 // starting express server
 app.listen(PORT, (err) => {

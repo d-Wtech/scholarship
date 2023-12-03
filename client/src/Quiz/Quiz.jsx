@@ -96,14 +96,25 @@ const Quiz = ({ TestName }) => {
             dispatch(setTestName({ testName }));
             setQuestions(res.data.questions.question);
             if (userSolutions.solutions.length == 0) {
+              sendInfoMessage("Test Started");
               res.data.questions.question.forEach((question, index) => {
-                dispatch(
-                  setSolutions({
-                    questionId: question._id,
-                    optionId: "",
-                    visitedFlag: false,
-                  })
-                );
+                if (index == 0) {
+                  dispatch(
+                    setSolutions({
+                      questionId: question._id,
+                      optionId: null,
+                      visitedFlag: true,
+                    })
+                  );
+                } else {
+                  dispatch(
+                    setSolutions({
+                      questionId: question._id,
+                      optionId: null,
+                      visitedFlag: false,
+                    })
+                  );
+                }
               });
             }
           } else {
@@ -169,12 +180,12 @@ const Quiz = ({ TestName }) => {
       if (userSolutions.solutions[i].questionId == questionId) {
         if (
           userSolutions.solutions[i].visitedFlag &&
-          userSolutions.solutions[i].optionId.length > 0
+          userSolutions.solutions[i].optionId != null
         ) {
           return colorPack.attempted;
         } else if (
           userSolutions.solutions[i].visitedFlag &&
-          userSolutions.solutions[i].optionId.length == 0
+          userSolutions.solutions[i].optionId == null
         ) {
           return colorPack.visited;
         }
