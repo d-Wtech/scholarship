@@ -75,7 +75,7 @@ export const sendResult = async (req, res) => {
     }
 
     // finding the test in database
-    const test = await testModel.find({ testName });
+    const test = await testModel.findOne({ testName });
     if (!test) {
       const err = new Error("No such test found");
       throw err;
@@ -101,6 +101,7 @@ export const sendResult = async (req, res) => {
     const data = {
       ques: questions.question,
       ans: userans.solutions,
+      testDetails: test,
     };
 
     res.json({ success: true, message: "result was successfully sent.", data });
