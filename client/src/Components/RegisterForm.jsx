@@ -6,9 +6,12 @@ import {
   sendInfoMessage,
   sendErrorMessage,
 } from "../utils/notifier.js";
+import { initializeRazorpay } from "../RazorpayPayment/Razorpay.initializepayment.js";
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -83,57 +86,102 @@ const Register = () => {
 
   const handlePayment = async () => {
     try {
-      // Simulate a payment API call
-      const response = await fetch("your_payment_api_endpoint", {
-        method: "POST",
-        body: JSON.stringify({
-          // Include payment details here
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Payment failed");
+      const isInitialized = await initializeRazorpay();
+      if (!isInitialized) {
+        const error = new Error("Falied to initialize the RazorPay");
+        throw error;
       }
 
-      // Payment successful, proceed with registration
-      return true;
+      const res = await axios.post(
+        "/api/payment-gateway/create-order/quiz-app",
+        {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          mobileNumber: formData.mobileNumber,
+        }
+      );
+
+      const userId = res.data.orderResponse.userId;
+
+      let options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        name: "Scholarship",
+        currency: res.data.orderResponse.currency,
+        amount: res.data.orderResponse.amount,
+        order_id: res.data.orderResponse.id,
+        description: "This is scholarship app payment",
+        image:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMIC3apFP9-9hghtlDJWO_pR5DZpoq3aO4Bw&usqp=CAU",
+        handler: async (response) => {
+          await registerUser(response, userId);
+        },
+        prefill: {
+          name: formData.firstName + " " + formData.lastName,
+          email: formData.email,
+          contact: formData.mobileNumber,
+        },
+        notes: {
+          note: "payment using Razorpay gateway",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+
+      paymentObject.open();
+
+      paymentObject.on("payment.failed", (error) => {
+        console.error(error);
+        sendErrorMessage("Payment failed");
+      });
     } catch (error) {
-      setErrors({ ...errors, paymentError: "Payment failed" });
-      return false;
+      sendErrorMessage("Failed to get the pop up for payment");
+    }
+    return false;
+  };
+
+  const registerUser = async (checkout_result, userId) => {
+    try {
+      // registering the user
+      const data = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        mobileNumber: formData.mobileNumber,
+        password: formData.password,
+        orderId: checkout_result.razorpay_order_id,
+        paymentId: checkout_result.razorpay_payment_id,
+        paymentSignature: checkout_result.razorpay_signature,
+        userId: userId,
+      };
+      const res = await axios.post("/api/user-signup", data);
+
+      if (res.data.success) {
+        sendSuccessMessage(res.data.message);
+        sendInfoMessage("Now you can login");
+        navigate("/login");
+      } else {
+        sendErrorMessage(res.data.error);
+      }
+    } catch (error) {
+      sendErrorMessage("Failed to register user");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    try {
-      if (validateForm()) {
-        // registering the user
-        const data = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          mobileNumber: formData.mobileNumber,
-          password: formData.password,
-        };
-
-        const res = await axios.post("/api/user-signup", data);
-        if (res.data.success) {
-          sendSuccessMessage(res.data.message);
-          sendInfoMessage("Now you can login");
-          navigate("/login");
-        } else {
-          sendErrorMessage(res.data.error);
-        }
-      } else {
-        throw new Error("Invalid details entered");
-      }
-    } catch (error) {
-      sendErrorMessage("Form Validation failed");
+    if (validateForm()) {
+      await handlePayment();
+    } else {
+      sendInfoMessage("Form Validation failed");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -225,9 +273,14 @@ const Register = () => {
       <div className="text-red-500">{errors.paymentError}</div>
       <button
         type="submit"
-        className="bg-blue-500 m-auto p-2 text-xl text-white rounded-xl"
+        disabled={loading}
+        className="bg-blue-500 disabled:bg-blue-300 m-auto p-2 text-xl text-white rounded-xl disabled:cursor-progress"
       >
-        Register with Payment
+        {loading ? (
+          <span>Loading ...</span>
+        ) : (
+          <span>Register with Payment</span>
+        )}
       </button>
     </form>
   );

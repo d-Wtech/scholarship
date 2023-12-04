@@ -140,13 +140,16 @@ const TestResult = ({ TestName }) => {
       return "#ff0000";
     }
     if (isCorrectOption) {
-      return "#00ff00";
+      return "#00ffff";
     }
     return "#ffffff";
   };
 
-  const getQuestionColor = (visitedFlag) => {
-    if (visitedFlag) {
+  const getQuestionColor = (solution) => {
+    if (solution.visitedFlag && solution.optionId != null) {
+      return "#00ff00";
+    }
+    if (solution.visitedFlag) {
       return "#ffff00";
     }
     return "#ffffff";
@@ -410,7 +413,7 @@ const TestResult = ({ TestName }) => {
                         fill={getQuestionColor(
                           answers.find(
                             (record) => record.questionId === question._id
-                          ).visitedFlag
+                          )
                         )}
                       />
                     </svg>
