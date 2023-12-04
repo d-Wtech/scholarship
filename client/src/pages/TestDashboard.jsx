@@ -187,7 +187,7 @@ const TestDashboard = ({ TestName }) => {
                   </div>
 
                   <div className="text-gray-300 text-sm mt-4">
-                    <p>* make you have read the instructions</p>
+                    <p>* make sure you have read the instructions</p>
                   </div>
                 </div>
               );

@@ -7,6 +7,7 @@ import authRouter from "./src/routes/auth.route.js";
 import adminRouter from "./src/routes/admin.route.js";
 import userRouter from "./src/routes/user.route.js";
 import userRecordRouter from "./src/routes/userRecord.route.js";
+import paymentRouter from "./src/routes/payment.route.js";
 
 // configuring dotenv
 dotenv.config();
@@ -30,6 +31,7 @@ app.use("/api", authRouter);
 app.use("/api", adminRouter);
 app.use("/api", userRouter);
 app.use("/api", userRecordRouter);
+app.use("/api", paymentRouter);
 
 // starting express server
 app.listen(PORT, (err) => {
