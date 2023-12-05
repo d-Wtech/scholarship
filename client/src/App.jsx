@@ -14,6 +14,7 @@ import AdminLogin from "./Admin/AdminLogin";
 import AdminSignup from "./Admin/AdminSignup";
 import AdminDashboard from "./Admin/AdminDashboard";
 import AdminPrivate from "./Admin/AdminPrivate";
+import Home from "./pages/Home";
 
 const App = () => {
   const TestName = "EcoSysytem-Test";
@@ -21,6 +22,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Home />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
