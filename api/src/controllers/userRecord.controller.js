@@ -3,6 +3,46 @@ import { questionModel } from "../models/question.model.js";
 import { recordModel } from "../models/record.model.js";
 import { testModel } from "../models/test.model.js";
 
+const getCorrectQuestionsCount = (questionsArray, answersArray) => {
+  let c = 0;
+
+  questionsArray.forEach((question, index) => {
+    let markedOption = answersArray.find(
+      (record) => record.questionId === String(question._id)
+    );
+
+    let correctOption = question.questionOption.find(
+      (option) => option.isCorrect
+    );
+
+    if (String(correctOption._id) === markedOption.optionId) {
+      c++;
+    }
+  });
+
+  return c;
+};
+
+const getIncorrectQuestionCount = (questionsArray, answersArray) => {
+  let c = 0;
+
+  questionsArray.forEach((question) => {
+    const markedOptionId = answersArray.find(
+      (record) => record.questionId === String(question._id)
+    ).optionId;
+
+    const correctOptionId = String(
+      question.questionOption.find((option) => option.isCorrect)._id
+    );
+
+    if (markedOptionId !== null && markedOptionId !== correctOptionId) {
+      c++;
+    }
+  });
+
+  return c;
+};
+
 export const recordResponses = async (req, res) => {
   try {
     // getting the user id from request
@@ -24,23 +64,44 @@ export const recordResponses = async (req, res) => {
 
     // getting the data
     const { testName, solutions } = req.body;
-    if (!testName || solutions.length === 0 || testName != testNameFromUrl) {
+    if (!testName || solutions.length == 0 || testName != testNameFromUrl) {
       const err = new Error("Invalid test name provided");
       throw err;
     }
 
     // finding the test in database
-    const test = await testModel.find({ testName });
+    const test = await testModel.findOne({ testName });
     if (!test) {
       const err = new Error("No such test found");
       throw err;
     }
+
+    // calculating the result
+    const questions = await questionModel.findOne({ testName });
+    if (!questions) {
+      const err = new Error("No such data found");
+      throw err;
+    }
+    const ques = questions.question;
+    if (ques.length != solutions.length) {
+      const err = new Error("Unknown number of solutions");
+      throw err;
+    }
+
+    const correctQuestions = getCorrectQuestionsCount(ques, solutions);
+    const incorrectQuestions = getIncorrectQuestionCount(ques, solutions);
+
+    let marksObtained =
+      test.marksPerQuestion * correctQuestions -
+      Number(test.negativeMarking) * incorrectQuestions;
+    console.log(marksObtained);
 
     // saving the record
     const saveRecord = new recordModel({
       userId,
       testName,
       solutions,
+      marksObtained,
     });
     await saveRecord.save();
 

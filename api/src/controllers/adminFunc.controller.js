@@ -1,6 +1,80 @@
 import { adminModel } from "../models/admin.model.js";
+import { authModel } from "../models/auth.model.js";
 import { questionModel } from "../models/question.model.js";
+import { recordModel } from "../models/record.model.js";
 import { testModel } from "../models/test.model.js";
+
+export const getTestDetials = async (req, res) => {
+  try {
+    // getting the admin id
+    const userId = req.userId;
+    if (!userId) {
+      const err = new Error("Invalid user");
+      throw err;
+    }
+
+    // checking if admin exists
+    const admin = await adminModel.findOne({ _id: userId });
+    if (!admin) {
+      const err = new Error("You are not authorized");
+      throw err;
+    }
+
+    // getting the test name
+    const { testName } = req.params;
+    if (!testName || testName.length == 0) {
+      const err = new Error("Invalid test name");
+      throw err;
+    }
+
+    // fetching the test details from the database
+    const testDetails = await testModel.findOne({ testName });
+    if (!testDetails) {
+      const error = new Error("No test details found");
+      throw error;
+    }
+
+    // fetching the all registered users
+    const users = await authModel.find();
+    if (users.length == 0) {
+      const err = new Error("No one has registered");
+      throw err;
+    }
+    // extracting the required information
+    const userData = [];
+    users.forEach((user, index) => {
+      userData.push({
+        userId: user._id,
+        name: user.firstName + " " + user.lastName,
+        email: user.email,
+        mobileNumber: user.mobileNumber,
+      });
+    });
+
+    // getting the marks
+    const records = await recordModel.find({ testName });
+    if (records.length == 0) {
+      const err = new Error("No one has submitted the test yet");
+      throw err;
+    }
+    // extract the results
+    const usersResults = [];
+    records.forEach((record, index) => {
+      usersResults.push({ userId: record.userId, marks: record.marksObtained });
+    });
+
+    // data to be sent
+    const data = {
+      testDetails,
+      usersDetails: userData,
+      usersResults,
+    };
+
+    res.json({ success: true, message: "Details sent successfully", data });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+};
 
 export const addTestDetails = async (req, res) => {
   try {

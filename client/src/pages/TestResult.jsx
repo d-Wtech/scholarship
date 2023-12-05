@@ -59,9 +59,12 @@ const TestResult = ({ TestName }) => {
       let c = 0;
       questionsArray.forEach((question, index) => {
         if (
-          question.questionOption.find((option) => option.isCorrect)._id ===
-          answersArray.find((record) => record.questionId === question._id)
-            .optionId
+          String(
+            question.questionOption.find((option) => option.isCorrect)._id
+          ) ===
+          answersArray.find(
+            (record) => record.questionId === String(question._id)
+          ).optionId
         ) {
           c++;
         }
@@ -73,11 +76,11 @@ const TestResult = ({ TestName }) => {
       let c = 0;
       questionsArray.forEach((question) => {
         const markedOptionId = answersArray.find(
-          (record) => record.questionId === question._id
+          (record) => record.questionId === String(question._id)
         ).optionId;
-        const correctOptionId = question.questionOption.find(
-          (option) => option.isCorrect
-        )._id;
+        const correctOptionId = String(
+          question.questionOption.find((option) => option.isCorrect)._id
+        );
 
         if (markedOptionId !== null && markedOptionId !== correctOptionId) {
           c++;
@@ -279,8 +282,7 @@ const TestResult = ({ TestName }) => {
                   {userTestResult.marksPerQuestion *
                     userTestResult.correctQuestions -
                     userTestResult.negativeMarking *
-                      userTestResult.incorrectQuestions *
-                      userTestResult.marksPerQuestion}
+                      userTestResult.incorrectQuestions}
                 </td>
               </tr>
               <tr>
@@ -412,7 +414,8 @@ const TestResult = ({ TestName }) => {
                         r="10"
                         fill={getQuestionColor(
                           answers.find(
-                            (record) => record.questionId === question._id
+                            (record) =>
+                              record.questionId === String(question._id)
                           )
                         )}
                       />
@@ -428,7 +431,8 @@ const TestResult = ({ TestName }) => {
                         color: getOptionColor(
                           option._id,
                           answers.find(
-                            (record) => record.questionId === question._id
+                            (record) =>
+                              record.questionId === String(question._id)
                           ).optionId,
                           option.isCorrect
                         ),
