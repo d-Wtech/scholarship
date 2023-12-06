@@ -149,7 +149,9 @@ const Admin_getTestDetails = () => {
             <h2 className="text-2xl font-semibold mb-4 text-blue-600">
               Student Information
             </h2>
-            <p className="text-sm text-slate-400 m-1 p-2">*Click the headings to sort</p>
+            <p className="text-sm text-slate-400 m-1 p-2">
+              *Click the headings to sort
+            </p>
             <table className="min-w-full bg-white border border-gray-300 rounded-md overflow-hidden">
               <thead className="bg-gray-200">
                 <tr>

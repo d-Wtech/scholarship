@@ -94,7 +94,6 @@ export const recordResponses = async (req, res) => {
     let marksObtained =
       test.marksPerQuestion * correctQuestions -
       Number(test.negativeMarking) * incorrectQuestions;
-    console.log(marksObtained);
 
     // saving the record
     const saveRecord = new recordModel({

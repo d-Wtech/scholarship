@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { sendErrorMessage, sendInfoMessage } from "../utils/notifier.js";
 import Loading from "../Components/Loading.jsx";
+import { resetUserAnsState } from "../store/features/userAns.js";
 
 const TestResult = ({ TestName }) => {
   const { testName } = useParams();
@@ -35,6 +36,8 @@ const TestResult = ({ TestName }) => {
   };
 
   useEffect(() => {
+    dispatch(resetUserAnsState());
+
     const getVisitedQuestionsCount = (answersArray) => {
       let c = 0;
       answersArray.forEach((value, index) => {
@@ -126,6 +129,7 @@ const TestResult = ({ TestName }) => {
             });
           } else {
             sendInfoMessage("Error while getting the result");
+            navigate("/test-dashboard");
           }
         } catch (error) {
           sendErrorMessage("Error while getting result");
