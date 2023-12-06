@@ -3,6 +3,7 @@ import { authModel } from "../models/auth.model.js";
 import { questionModel } from "../models/question.model.js";
 import { recordModel } from "../models/record.model.js";
 import { testModel } from "../models/test.model.js";
+import { getAvailableTime } from "../utils/getAvailableTime.js";
 
 export const getTestDetials = async (req, res) => {
   try {
@@ -90,7 +91,30 @@ export const addTestDetails = async (req, res) => {
       throw err;
     }
 
-    const addTest = new testModel(req.body);
+    const {
+      testName,
+      totalQuestions,
+      marksPerQuestion,
+      negativeMarking,
+      startTime,
+      endTime,
+    } = req.body;
+
+    // calculate time
+    const timeAvailable = getAvailableTime(startTime, endTime);
+
+    // saving the details
+    const addTest = new testModel({
+      testName,
+      totalQuestions,
+      marksPerQuestion,
+      negativeMarking,
+      timeAvailable,
+      timings: {
+        startTime: startTime,
+        endTime: endTime,
+      },
+    });
     await addTest.save();
 
     res.json({ success: true, message: "Test details added" });

@@ -16,12 +16,18 @@ const Admin_addTest = () => {
     totalQuestions: "",
     marksPerQuestion: "",
     negativeMarking: false,
-    timeAvailable: "",
-  });
-  const [timeAvailable, setTimeAvailable] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+    startDate: "",
+    startTime: {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    },
+    endDate: "",
+    endTime: {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    },
   });
   const [isLoading, setIsloading] = useState(false);
 
@@ -33,33 +39,40 @@ const Admin_addTest = () => {
     }));
   };
 
-  const handleTimeChange = (e) => {
+  const handleStartTimeChange = (e) => {
     const { name, value } = e.target;
-    setTimeAvailable((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
 
-    const fullTime = `${
-      timeAvailable.hours < 10 ? "0" + timeAvailable.hours : timeAvailable.hours
-    }:${
-      timeAvailable.minutes < 10
-        ? "0" + timeAvailable.minutes
-        : timeAvailable.minutes
-    }:${
-      timeAvailable.seconds < 10
-        ? "0" + timeAvailable.seconds
-        : timeAvailable.seconds
-    }`;
-    setFormData((prev) => {
-      return { ...prev, timeAvailable: fullTime };
+    setFormData((prevData) => {
+      return {
+        ...prevData,
+        startTime: {
+          ...prevData.startTime,
+          [name]: value,
+        },
+      };
+    });
+  };
+
+  const handleEndTimeChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => {
+      return {
+        ...prevData,
+        endTime: {
+          ...prevData.endTime,
+          [name]: value,
+        },
+      };
     });
   };
 
   const checkDataValidity = () => {
     Object.keys(formData).forEach((key) => {
-      if (!formData[key] || formData.length > 0) {
-        return false;
+      if (key != "timeAvailable" && key != "startTime") {
+        if (!formData[key] || formData.length > 0) {
+          return false;
+        }
       }
     });
 
@@ -68,38 +81,82 @@ const Admin_addTest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsloading(true);
 
-    const token = adminStatus.token;
+    if (confirm("Are you sure you want to submit?")) {
+      setIsloading(true);
 
-    if (checkDataValidity() && token.length > 0) {
-      try {
-        const res = await axios.post("/api/admin/add-test-details", formData, {
-          headers: { Authorization: "Bearer " + token },
-        });
+      const token = adminStatus.token;
 
-        if (res.data.success) {
-          sendSuccessMessage(res.data.message);
-          setFormData({
-            testName: "",
-            totalQuestions: "",
-            marksPerQuestion: "",
-            negativeMarking: false,
-            timeAvailable: "",
-          });
-          setTimeAvailable({ hours: 0, minutes: 0, seconds: 0 });
-        } else {
-          sendInfoMessage("Error adding test details");
-          sendWarningMessage(res.data.error);
+      if (checkDataValidity() && token.length > 0) {
+        try {
+          const res = await axios.post(
+            "/api/admin/add-test-details",
+            {
+              testName: formData.testName,
+              totalQuestions: formData.totalQuestions,
+              marksPerQuestion: formData.marksPerQuestion,
+              negativeMarking: formData.negativeMarking,
+              endTime: getFullDateTime("endTime", "endDate"),
+              startTime: getFullDateTime("startTime", "startDate"),
+            },
+            {
+              headers: { Authorization: "Bearer " + token },
+            }
+          );
+
+          if (res.data.success) {
+            sendSuccessMessage(res.data.message);
+            setFormData({
+              testName: "",
+              totalQuestions: "",
+              marksPerQuestion: "",
+              negativeMarking: false,
+              startDate: "",
+              startTime: {
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+              },
+              endDate: "",
+              endTime: {
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+              },
+            });
+          } else {
+            sendInfoMessage("Error adding test details");
+            sendWarningMessage(res.data.error);
+          }
+        } catch (error) {
+          sendErrorMessage("Error");
         }
-      } catch (error) {
-        sendErrorMessage("Error");
+      } else {
+        sendWarningMessage("All are required fields");
       }
-    } else {
-      sendWarningMessage("All are required fields");
-    }
 
-    setIsloading(false);
+      setIsloading(false);
+    }
+  };
+
+  const getFullDateTime = (Time, Date) => {
+    const hours = formData[Time].hours;
+    const mins = formData[Time].minutes;
+    const secs = formData[Time].seconds;
+    const time = `${hours < 10 ? "0" + hours : hours}:${
+      mins < 10 ? "0" + mins : mins
+    }:${secs < 10 ? "0" + secs : secs}`;
+    const date = formData[Date];
+    const dateTime = date + "T" + time;
+    return dateTime;
+  };
+
+  const getMinDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = `${now.getMonth() + 1}`.padStart(2, "0");
+    const day = `${now.getDate()}`.padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -165,55 +222,138 @@ const Admin_addTest = () => {
             Allow Negative Marking
           </label>
         </div>
+
         <div className="mb-4">
-          <label htmlFor="timeAvailable" className="block text-gray-600">
-            Time Available:
+          <label htmlFor="starting" className="text-gray-600 flex flex-row">
+            Starting Time:
+            <span className="flex items-center px-2 text-gray-600 text-sm">
+              YYYY-MM-DDTHH:MM:SSZ
+            </span>
           </label>
-          <div className="flex">
+          <div className="flex flex-col">
+            <span className="flex items-center px-2 text-gray-600 text-sm">
+              Start Date
+            </span>
+            <input
+              type="date"
+              name="startDate"
+              value={formData.startDate}
+              id="startTime"
+              autoComplete="off"
+              min={getMinDate()}
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
+          <span className="flex items-center px-2 text-gray-600 text-sm">
+            Start Time
+          </span>
+          <div className="flex m-1">
             <input
               type="number"
-              id="hours"
+              id="starthours"
               name="hours"
-              value={
-                timeAvailable.hours < 10
-                  ? "0" + timeAvailable.hours
-                  : timeAvailable.hours
-              }
-              onChange={handleTimeChange}
+              value={formData.startTime.hours}
+              onChange={handleStartTimeChange}
               min="0"
-              max="99"
+              max="23"
+              maxLength={2}
               className="w-1/4 px-4 py-2 border rounded-l-md focus:outline-none focus:border-blue-500"
               required
             />
             <span className="flex items-center px-2 text-gray-600">hrs</span>
             <input
               type="number"
-              id="minutes"
+              id="startminutes"
               name="minutes"
-              value={
-                timeAvailable.minutes < 10
-                  ? "0" + timeAvailable.minutes
-                  : timeAvailable.minutes
-              }
-              onChange={handleTimeChange}
+              value={formData.startTime.minutes}
+              onChange={handleStartTimeChange}
               min="0"
               max="59"
+              maxLength={2}
               className="w-1/4 px-4 py-2 border focus:outline-none focus:border-blue-500"
               required
             />
             <span className="flex items-center px-2 text-gray-600">min</span>
             <input
               type="number"
-              id="seconds"
+              id="startseconds"
               name="seconds"
-              value={
-                timeAvailable.seconds < 10
-                  ? "0" + timeAvailable.seconds
-                  : timeAvailable.seconds
-              }
-              onChange={handleTimeChange}
+              value={formData.startTime.seconds}
+              onChange={handleStartTimeChange}
               min="0"
               max="59"
+              maxLength={2}
+              className="w-1/4 px-4 py-2 border rounded-r-md focus:outline-none focus:border-blue-500"
+              required
+            />
+            <span className="flex items-center px-2 text-gray-600">sec</span>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="ending" className="text-gray-600 flex flex-row">
+            End Time:
+            <span className="flex items-center px-2 text-gray-600 text-sm">
+              YYYY-MM-DDTHH:MM:SSZ
+            </span>
+          </label>
+          <div className="flex flex-col">
+            <span className="flex items-center px-2 text-gray-600 text-sm">
+              End Date
+            </span>
+            <input
+              type="date"
+              name="endDate"
+              value={formData.endDate}
+              id="endDate"
+              autoComplete="off"
+              min={getMinDate()}
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
+          <span className="flex items-center px-2 text-gray-600 text-sm">
+            End Time
+          </span>
+          <div className="flex m-1">
+            <input
+              type="number"
+              id="endHours"
+              name="hours"
+              value={formData.endTime.hours}
+              onChange={handleEndTimeChange}
+              min="0"
+              max="23"
+              maxLength={2}
+              className="w-1/4 px-4 py-2 border rounded-l-md focus:outline-none focus:border-blue-500"
+              required
+            />
+            <span className="flex items-center px-2 text-gray-600">hrs</span>
+            <input
+              type="number"
+              id="endminutes"
+              name="minutes"
+              value={formData.endTime.minutes}
+              onChange={handleEndTimeChange}
+              min="0"
+              max="59"
+              maxLength={2}
+              className="w-1/4 px-4 py-2 border focus:outline-none focus:border-blue-500"
+              required
+            />
+            <span className="flex items-center px-2 text-gray-600">min</span>
+            <input
+              type="number"
+              id="endseconds"
+              name="seconds"
+              value={formData.endTime.seconds}
+              onChange={handleEndTimeChange}
+              min="0"
+              max="59"
+              maxLength={2}
               className="w-1/4 px-4 py-2 border rounded-r-md focus:outline-none focus:border-blue-500"
               required
             />

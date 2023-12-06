@@ -150,8 +150,8 @@ const TestPreview = ({ TestName }) => {
   return (
     <>
       {!canGiveTestStatus ? (
-        <div>
-          <div className="flex flex-col items-center justify-between w-screen h-screen">
+        <div className="flex flex-col items-center justify-center w-screen h-screen bg-slate-950">
+          <div className="flex items-center justify-between gap-2 flex-col p-3">
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-white border-r-2 border-b-2"></div>
             <p className="m-1 p-1 text-slate-500 text-sm">
               Checking if you are allowed to give the exam
