@@ -3,6 +3,7 @@ import { questionModel } from "../models/question.model.js";
 import { authModel } from "../models/auth.model.js";
 import { recordModel } from "../models/record.model.js";
 import { orderModel } from "../models/orders.model.js";
+import { checkGreaterTime } from "../utils/ZuluFormat.js";
 
 export const canGiveTest = async (req, res) => {
   try {
@@ -24,6 +25,16 @@ export const canGiveTest = async (req, res) => {
     const test = await testModel.findOne({ testName });
     if (!test) {
       const err = new Error("Test not found");
+      throw err;
+    }
+
+    // checking the test timings
+    if (!checkGreaterTime(test.timings.endTime)) {
+      const err = new Error("Test has timed out");
+      throw err;
+    }
+    if (checkGreaterTime(test.timings.startTime)) {
+      const err = new Error("Test has not started");
       throw err;
     }
 

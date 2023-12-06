@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { sendErrorMessage, sendInfoMessage } from "../utils/notifier.js";
 import Loading from "../Components/Loading.jsx";
+import { checkGreaterTime, getLocaleTime } from "../utils/ZuluFormat.js";
 
 const TestDashboard = ({ TestName }) => {
   const loginStatus = useSelector((state) => state.login);
@@ -129,6 +130,27 @@ const TestDashboard = ({ TestName }) => {
             testDetail.map((test, index) => {
               return (
                 <div className="bg-gray-800 p-4 rounded shadow-md" key={index}>
+                  {checkGreaterTime(test.timings.endTime) ? (
+                    checkGreaterTime(test.timings.startTime) ? (
+                      <h1 className="m-1 p-1">
+                        <span className="font-bold text-green-400 uppercase text-xl font-sans">
+                          NOT YET STARTED
+                        </span>
+                      </h1>
+                    ) : (
+                      <h1 className="m-1 p-1">
+                        <span className="font-bold text-green-400 uppercase text-xl font-sans">
+                          RUNNING...
+                        </span>
+                      </h1>
+                    )
+                  ) : (
+                    <h1 className="m-1 p-1">
+                      <span className="font-bold text-red-400 uppercase text-xl font-sans">
+                        ! ENDED
+                      </span>
+                    </h1>
+                  )}
                   <ul className="list-disc pl-4 capitalize">
                     <li>
                       <span className="font-bold">Test Name:</span>{" "}
@@ -160,12 +182,28 @@ const TestDashboard = ({ TestName }) => {
                       </span>{" "}
                       {test.timeAvailable}
                     </li>
+                    <li>
+                      <span className="font-bold text-purple-400">
+                        Start on {`(YYYY-MM-DDTHH:MM:SSZ)`}:
+                      </span>{" "}
+                      {getLocaleTime(test.timings.startTime)}
+                    </li>
+                    <li>
+                      <span className="font-bold text-purple-400">
+                        Ends on {`(YYYY-MM-DDTHH:MM:SSZ)`}:
+                      </span>{" "}
+                      {getLocaleTime(test.timings.endTime)}
+                    </li>
                   </ul>
 
                   <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-6">
                     <button
                       type="button"
-                      className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-2 sm:mb-0 sm:mr-4"
+                      disabled={
+                        !checkGreaterTime(test.timings.endTime) ||
+                        checkGreaterTime(test.timings.startTime)
+                      }
+                      className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-2 sm:mb-0 sm:mr-4 disabled:cursor-not-allowed"
                       onClick={() => {
                         handleOnStart(
                           test.testName,

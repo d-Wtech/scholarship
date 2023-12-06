@@ -38,7 +38,7 @@ const Quiz = ({ TestName }) => {
           });
 
           if (res.data.success) {
-            sendSuccessMessage(res.data.message);
+            sendSuccessMessage("Eligible For Test");
             setCanGiveTestStatus(true);
           } else {
             sendWarningMessage(res.data.error);
@@ -178,8 +178,6 @@ const Quiz = ({ TestName }) => {
       } else {
         if (!token) {
           sendInfoMessage("You are not authenticated");
-        } else if (!canGiveTestStatus) {
-          sendInfoMessage("Cannot give re-test");
         }
       }
     };
