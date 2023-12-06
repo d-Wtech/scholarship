@@ -150,8 +150,15 @@ export const addQuestions = async (req, res) => {
       throw err;
     }
 
+    // finding questions
+    const questions_exits = await questionModel.findOne({ testName });
+    if (questions_exits) {
+      const err = new Error("Questions are already added");
+      throw err;
+    }
+
     // checking the total questions
-    if (question.length > test.totalQuestions) {
+    if (question.length != test.totalQuestions) {
       const err = new Error(
         testName + " has a limit of " + test.totalQuestions + " questions"
       );

@@ -43,7 +43,7 @@ const getIncorrectQuestionCount = (questionsArray, answersArray) => {
   return c;
 };
 
-export const recordResponses = async (req, res) => {
+export const updateResponses = async (req, res) => {
   try {
     // getting the user id from request
     const userId = req.userId;
@@ -88,6 +88,13 @@ export const recordResponses = async (req, res) => {
       throw err;
     }
 
+    // checking previous record
+    const prev_record = await recordModel.findOne({ userId, testName });
+    if (!prev_record) {
+      const err = new Error("Previous record not found");
+      throw err;
+    }
+
     const correctQuestions = getCorrectQuestionsCount(ques, solutions);
     const incorrectQuestions = getIncorrectQuestionCount(ques, solutions);
 
@@ -95,12 +102,74 @@ export const recordResponses = async (req, res) => {
       test.marksPerQuestion * correctQuestions -
       Number(test.negativeMarking) * incorrectQuestions;
 
+    // updating the record
+    const updateStatus = await recordModel.updateOne(
+      { userId, testName },
+      {
+        $set: {
+          solutions: solutions,
+          marksObtained,
+        },
+      }
+    );
+    if (!updateStatus.modifiedCount) {
+      const err = new Error("Nothing update");
+      throw err;
+    }
+
+    res.json({ success: true, message: "Record updated successfully" });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+};
+
+export const recordResponses = async (req, res) => {
+  try {
+    // getting the user id from request
+    const userId = req.userId;
+    if (!userId) {
+      const err = new Error("Invalid user");
+      throw err;
+    }
+
+    // finding user in the database
+    const user = await authModel.findOne({ _id: userId });
+    if (!user) {
+      const err = new Error("User not found");
+      throw err;
+    }
+
+    // getting test name from url
+    const testNameFromUrl = req.params.testName;
+
+    // getting the data
+    const { testName, solutions } = req.body;
+
+    if (!testName || solutions.length == 0 || testName != testNameFromUrl) {
+      const err = new Error("Invalid test name provided | Solution not found");
+      throw err;
+    }
+
+    // finding the test in database
+    const test = await testModel.findOne({ testName });
+    if (!test) {
+      const err = new Error("No such test found");
+      throw err;
+    }
+
+    // checking previous record
+    const prev_record = await recordModel.findOne({ userId, testName });
+    if (prev_record) {
+      const err = new Error("Previous record found");
+      throw err;
+    }
+
     // saving the record
     const saveRecord = new recordModel({
       userId,
       testName,
       solutions,
-      marksObtained,
+      marksObtained: 0,
     });
     await saveRecord.save();
 
