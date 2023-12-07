@@ -180,7 +180,7 @@ const TestDashboard = ({ TestName }) => {
                 Dnyanankur Publication {" > "} Test Center {" > "} Mock Test{" "}
                 {" > "} Test Details
               </p>
-              <p className="font-bold text-lg">Test Preview</p>
+              <p className="font-bold text-lg">Test Descriptions</p>
 
               {!testDetail ? (
                 <Loading />

@@ -342,7 +342,11 @@ const Quiz = ({ TestName }) => {
               <div className="bg-white p-6 rounded-md shadow-md w-full">
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold text-gray-900">
-                    {questions[questionNumber - 1].questionText}
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: questions[questionNumber - 1].questionText,
+                      }}
+                    />
                   </h3>
                 </div>
                 <div className="mb-6">
