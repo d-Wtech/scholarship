@@ -44,6 +44,12 @@ app.use("/api", userRouter);
 app.use("/api", userRecordRouter);
 app.use("/api", paymentRouter);
 
+
+// Define a route handler for the root endpoint
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
 // starting express server
 app.listen(PORT, (err) => {
   if (err) {
