@@ -273,7 +273,8 @@ const Register = () => {
         <div className="text-red-500">{errors.confirmPassword}</div>
       </label>
       <div className="text-red-500">{errors.paymentError}</div>
-      <button
+{/*       form submission button */}
+{/*       <button
         type="submit"
         disabled={loading}
         className="bg-blue-500 disabled:bg-blue-300 m-auto p-2 text-xl text-white rounded-xl disabled:cursor-progress"
@@ -283,7 +284,7 @@ const Register = () => {
         ) : (
           <span>Register with Payment</span>
         )}
-      </button>
+      </button> */}
     </form>
   );
 };
