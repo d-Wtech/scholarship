@@ -13,19 +13,19 @@ import paymentRouter from "./src/routes/payment.route.js";
 // configuring dotenv
 dotenv.config();
 
-// connecting to database
+// connecting to the database
 connectToDatabase(process.env.MONGO_URI);
 
-// creating express application
+// creating an express application
 const app = express();
 
 // port number
 const PORT = process.env.PORT || 9090;
 
-// setting up cors
+// setting up CORS globally
 app.use(
   cors({
-    origin: ["http://dnyanankur.in", "http://localhost:5500"], // specify the allowed origin
+    origin: ["http://dnyanankur.in", "http://localhost:5500"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
@@ -44,13 +44,19 @@ app.use("/api", userRouter);
 app.use("/api", userRecordRouter);
 app.use("/api", paymentRouter);
 
-
-// Define a route handler for the root endpoint
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
+// handle OPTIONS requests for the specific route
+app.options("/api/user-login", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "http://dnyanankur.in");
+  res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.status(200).send();
 });
 
-// starting express server
+app.get("/",(req,res)=>{
+  res.status("Hello World");
+})
+
+// starting the express server
 app.listen(PORT, (err) => {
   if (err) {
     console.log(err);
