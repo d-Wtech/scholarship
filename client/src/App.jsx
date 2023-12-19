@@ -17,7 +17,7 @@ import AdminPrivate from "./Admin/AdminPrivate";
 import Home from "./pages/Home";
 
 const App = () => {
-  const TestName = "EcoSysytem-Test";
+  const CompanyName = "EcoSysytem-Test";
 
   return (
     <BrowserRouter>
@@ -33,21 +33,21 @@ const App = () => {
         <Route element={<Private />}>
           <Route
             path="/test-dashboard"
-            element={<TestDashboard TestName={TestName} />}
+            element={<TestDashboard TestName={CompanyName} />}
           />
           <Route
             path="/:testName-preview"
-            element={<TestPreview TestName={TestName} />}
+            element={<TestPreview TestName={CompanyName} />}
           />
           <Route
             path={
               "/:testName-quiz/total-questions-/:totalQuestions/marks-per-question-/:marksPerQuestion/negative-marking-/:negativeMarking/time-available-/:timeAvailable"
             }
-            element={<Quiz TestName={TestName} />}
+            element={<Quiz TestName={CompanyName} />}
           />
           <Route
             path="/:testName-result"
-            element={<TestResult TestName={TestName} />}
+            element={<TestResult TestName={CompanyName} />}
           />
         </Route>
 
