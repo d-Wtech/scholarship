@@ -43,9 +43,14 @@ const TestDashboard = ({ TestName }) => {
 
       if (token && token.length > 0) {
         try {
-          const res = await axios.get(`/api/can-give-test/${testname}`, {
-            headers: { Authorization: "Bearer " + token },
-          });
+          const res = await axios.get(
+            `${
+              import.meta.env.VITE_API_BASE_URL
+            }/api/can-give-test/${testname}`,
+            {
+              headers: { Authorization: "Bearer " + token },
+            }
+          );
 
           if (res.data.success) {
             sendSuccessMessage("Eligible For Test");
@@ -84,11 +89,14 @@ const TestDashboard = ({ TestName }) => {
       const token = loginStatus.token;
       if (token) {
         try {
-          const res = await axios.get("/api/get-test-details", {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          });
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/get-test-details`,
+            {
+              headers: {
+                Authorization: "Bearer " + token,
+              },
+            }
+          );
 
           if (res.data.success) {
             setTestDetail(res.data.tests);
