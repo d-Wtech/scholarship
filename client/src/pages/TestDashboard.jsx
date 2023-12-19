@@ -28,6 +28,7 @@ const TestDashboard = ({ TestName }) => {
   const [testDetail, setTestDetail] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [remTime, setRemTime] = useState(false);
 
   const handleOnStart = async (
     testname,
@@ -112,6 +113,16 @@ const TestDashboard = ({ TestName }) => {
     getTestDetails();
   }, []);
 
+  useEffect(() => {
+    const interval = setTimeout(() => {
+      setRemTime(!remTime);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  });
+
   return (
     <>
       {isLoading ? (
@@ -177,7 +188,7 @@ const TestDashboard = ({ TestName }) => {
                 Dnyanankur Publication {" > "} Test Center {" > "} Mock Test{" "}
                 {" > "} Test Details
               </p>
-              <p className="font-bold text-lg">Test Preview</p>
+              <p className="font-bold text-lg">Test Descriptions</p>
 
               {!testDetail ? (
                 <Loading />
@@ -193,26 +204,46 @@ const TestDashboard = ({ TestName }) => {
                           <h1 className="m-1 p-1">
                             <span className="font-bold text-green-400 uppercase text-xl font-sans">
                               NOT YET STARTED{" "}
-                              <span className="text-sm p-1 m-1 text-yellow-600">
-                                starts in{" "}
-                                {getAvailableTime(
-                                  new Date(),
-                                  test.timings.startTime
-                                )}
-                              </span>
+                              {remTime ? (
+                                <span className="text-sm p-1 m-1 text-yellow-600">
+                                  starts in{" "}
+                                  {getAvailableTime(
+                                    new Date(),
+                                    test.timings.startTime
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="text-sm p-1 m-1 text-yellow-600">
+                                  starts in{" "}
+                                  {getAvailableTime(
+                                    new Date(),
+                                    test.timings.startTime
+                                  )}
+                                </span>
+                              )}
                             </span>
                           </h1>
                         ) : (
                           <h1 className="m-1 p-1">
                             <span className="font-bold text-green-400 uppercase text-xl font-sans">
                               RUNNING...
-                              <span className="text-sm p-1 m-1 text-yellow-600">
-                                ends in{" "}
-                                {getAvailableTime(
-                                  new Date(),
-                                  test.timings.endTime
-                                )}
-                              </span>
+                              {remTime ? (
+                                <span className="text-sm p-1 m-1 text-yellow-600">
+                                  ends in{" "}
+                                  {getAvailableTime(
+                                    new Date(),
+                                    test.timings.endTime
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="text-sm p-1 m-1 text-yellow-600">
+                                  ends in{" "}
+                                  {getAvailableTime(
+                                    new Date(),
+                                    test.timings.endTime
+                                  )}
+                                </span>
+                              )}
                             </span>
                           </h1>
                         )
