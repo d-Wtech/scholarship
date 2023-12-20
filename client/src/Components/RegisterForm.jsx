@@ -104,41 +104,45 @@ const Register = () => {
         }
       );
 
-      const userId = res.data.orderResponse.userId;
+      if (!res.data.success) {
+        sendErrorMessage("Unable to register");
+      } else {
+        const userId = res.data.orderResponse.userId;
 
-      let options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY,
-        name: "Scholarship",
-        currency: res.data.orderResponse.currency,
-        amount: res.data.orderResponse.amount,
-        order_id: res.data.orderResponse.id,
-        description: "This is scholarship app payment",
-        image:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMIC3apFP9-9hghtlDJWO_pR5DZpoq3aO4Bw&usqp=CAU",
-        handler: async (response) => {
-          await registerUser(response, userId);
-        },
-        prefill: {
-          name: formData.firstName + " " + formData.lastName,
-          email: formData.email,
-          contact: formData.mobileNumber,
-        },
-        notes: {
-          note: "payment using Razorpay gateway",
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
+        let options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY,
+          name: "Scholarship",
+          currency: res.data.orderResponse.currency,
+          amount: res.data.orderResponse.amount,
+          order_id: res.data.orderResponse.id,
+          description: "This is scholarship app payment",
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMIC3apFP9-9hghtlDJWO_pR5DZpoq3aO4Bw&usqp=CAU",
+          handler: async (response) => {
+            await registerUser(response, userId);
+          },
+          prefill: {
+            name: formData.firstName + " " + formData.lastName,
+            email: formData.email,
+            contact: formData.mobileNumber,
+          },
+          notes: {
+            note: "payment using Razorpay gateway",
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
 
-      const paymentObject = new window.Razorpay(options);
+        const paymentObject = new window.Razorpay(options);
 
-      paymentObject.open();
+        paymentObject.open();
 
-      paymentObject.on("payment.failed", (error) => {
-        console.error(error);
-        sendErrorMessage("Payment failed");
-      });
+        paymentObject.on("payment.failed", (error) => {
+          console.error(error);
+          sendErrorMessage("Payment failed");
+        });
+      }
     } catch (error) {
       sendErrorMessage("Failed to get the pop up for payment");
     }
@@ -276,8 +280,7 @@ const Register = () => {
         <div className="text-red-500">{errors.confirmPassword}</div>
       </label>
       <div className="text-red-500">{errors.paymentError}</div>
-{/*       form submission button */}
-{/*       <button
+      <button
         type="submit"
         disabled={loading}
         className="bg-blue-500 disabled:bg-blue-300 m-auto p-2 text-xl text-white rounded-xl disabled:cursor-progress"
@@ -287,7 +290,7 @@ const Register = () => {
         ) : (
           <span>Register with Payment</span>
         )}
-      </button> */}
+      </button>
     </form>
   );
 };
