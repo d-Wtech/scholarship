@@ -24,12 +24,7 @@ const PORT = process.env.PORT || 9090;
 
 // setting up CORS globally
 app.use(
-  cors({
-    origin: ["http://dnyanankur.in", "http://localhost:9090"],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    optionsSuccessStatus: 204,
-  })
+  cors();
 );
 
 // middlewares
