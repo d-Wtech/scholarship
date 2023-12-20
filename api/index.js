@@ -52,6 +52,21 @@ app.options("/api/user-login", (req, res) => {
   res.status(200).send();
 });
 
+// Apply CORS headers for the specific route
+app.options("/api/admin/login", cors()); // Enable preflight request for the route
+
+app.post("/api/admin/login", cors(), (req, res) => {
+  // Your logic for admin login
+
+  // Respond with appropriate CORS headers
+  res.header("Access-Control-Allow-Origin", "http://www.dnyanankur.in");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  
+  // Your response logic
+  res.send("Admin login successful");
+});
+
 app.get("/",(req,res)=>{
   res.status("Hello World");
 })
