@@ -159,7 +159,10 @@ const Register = () => {
         paymentSignature: checkout_result.razorpay_signature,
         userId: userId,
       };
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/user-signup`, data);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/user-signup`,
+        data
+      );
 
       if (res.data.success) {
         sendSuccessMessage(res.data.message);

@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 9090;
 // setting up cors
 app.use(
   cors({
-    origin: ["http://dnyanankur.in", "http://localhost:5500"], // specify the allowed origin
+    origin: process.env.ORIGIN, // specify the allowed origin
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,

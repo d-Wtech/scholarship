@@ -257,7 +257,7 @@ const Quiz = ({ TestName }) => {
   };
 
   const moveToNextQuestion = () => {
-    if (questionNumber < 15) {
+    if (questionNumber < questions.length) {
       setQuestionNumber(questionNumber + 1);
     }
   };
