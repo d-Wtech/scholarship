@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendErrorMessage, sendSuccessMessage } from "../utils/notifier";
-import axios from "axios";
 import { setUserData } from "../store/features/loginSlice.js";
 import { useDispatch } from "react-redux";
 
@@ -63,26 +62,36 @@ const Login = () => {
 
     try {
       if (validateForm()) {
-        const res = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/user-login`,
-          formData
-        );
-        if (res.data.success) {
-          sendSuccessMessage(res.data.message);
-          const userData = res.data.userData;
-          dispatch(
-            setUserData({
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              email: userData.email,
-              mobileNumber: userData.mobileNumber,
-              registeredAt: userData.regd,
-              token: userData.token,
-            })
-          );
-          navigate("/test-dashboard");
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/user-login`, {
+          method: 'POST',
+          credentials: 'include', // Include cookies in the request
+          headers: {
+            'Content-Type': 'application/json', // Set the content type of the request
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (res.ok) {
+          const result = await res.json();
+          if (result.success) {
+            sendSuccessMessage(result.message);
+            const userData = result.userData;
+            dispatch(
+              setUserData({
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                email: userData.email,
+                mobileNumber: userData.mobileNumber,
+                registeredAt: userData.regd,
+                token: userData.token,
+              })
+            );
+            navigate("/test-dashboard");
+          } else {
+            sendErrorMessage(result.error);
+          }
         } else {
-          sendErrorMessage(res.data.error);
+          throw new Error("Login failed");
         }
       } else {
         throw new Error("Invalid details entered");
@@ -95,7 +104,7 @@ const Login = () => {
   };
 
   return (
-    <form className="flex flex-col gap-3 p-2" onSubmit={handleSubmit}>
+     <form className="flex flex-col gap-3 p-2" onSubmit={handleSubmit}>
       <label htmlFor="email">
         Email id: <span className="text-red-500">*</span>{" "}
         <input
