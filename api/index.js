@@ -13,7 +13,7 @@ import paymentRouter from "./src/routes/payment.route.js";
 // configuring dotenv
 dotenv.config();
 
-// connecting to database
+// connecting to the database
 connectToDatabase(process.env.MONGO_URI);
 
 // creating express application
@@ -22,10 +22,10 @@ const app = express();
 // port number
 const PORT = process.env.PORT || 9090;
 
-// setting up cors
+// setting up CORS
 app.use(
   cors({
-    origin: api.dnyanankur.in , dnyanankur.in , // specify the allowed origin
+    origin: ["http://dnyanankur.in", "http://api.dnyanankur.in", "http://localhost:5500"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     optionsSuccessStatus: 204,
@@ -43,6 +43,10 @@ app.use("/api", adminRouter);
 app.use("/api", userRouter);
 app.use("/api", userRecordRouter);
 app.use("/api", paymentRouter);
+
+app.get("/", (req, res) => {
+  res.status(200).send("Hello World");
+});
 
 // starting express server
 app.listen(PORT, (err) => {
