@@ -34,7 +34,7 @@ app.use(
 
 // Additional middleware to handle headers
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://dnyanankur.in'); // Replace with your specific origin
+   res.header('Access-Control-Allow-Origin', 'http://dnyanankur.in','http://api.dnyanankur.in'); // Replace with your specific origin
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
